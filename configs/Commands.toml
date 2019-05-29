@@ -1,0 +1,8 @@
+
+[discord]
+
+	[discord.embeds]
+		color = 16711680
+		footer = "DirtCraft's DirtBot | 2019"
+		title = ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:"
+

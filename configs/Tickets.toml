@@ -1,0 +1,28 @@
+servers = [["Interactions", "int", "575136219302854657", "575172637421076490"], ["Pixelmon", "pixel", "575136278291546123", "575172652843663371"]]
+
+[database]
+	password = "YelJV97WrVibSJub"
+	user = "bot"
+	url = "jdbc:mariadb://localhost:3306/support"
+
+[intervals]
+	autoclose = 30
+	gamesync = -1
+
+[discord]
+
+	[discord.channels]
+		adminSupportGenericChannelID = "575472262098976778"
+		notificationChannelID = "579324047410593813"
+		supportChannelID = "569176426964582401"
+		loggingChannelID = "569307208676802571"
+
+	[discord.categories]
+		ownerSupportCategoryID = "575472438440099850"
+		supportCategoryID = "569167433336619041"
+
+	[discord.embeds]
+		color = 16711680
+		footer = "DirtCraft Support System | 2019"
+		title = ":redbulletpoint: DirtCraft Support :redbulletpoint:"
+
