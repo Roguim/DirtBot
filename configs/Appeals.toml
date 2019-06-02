@@ -1,4 +1,7 @@
 
+[intervals]
+	autoclose = 30
+
 [discord]
 
 	[discord.channels]

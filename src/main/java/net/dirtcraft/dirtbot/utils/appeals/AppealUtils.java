@@ -23,7 +23,7 @@ public class AppealUtils {
         return members;
     }
 
-    public static String getAppealInfo(Appeal appeal) {
+    public String getAppealInfo(Appeal appeal) {
         String appealInfo = "";
         appealInfo += "**Username:** " + appeal.getUsername();
         appealInfo += "\n**Server:** " + appeal.getServer();
@@ -32,6 +32,11 @@ public class AppealUtils {
         appealInfo += "\n**Channel:** <#" + appeal.getChannelID() + ">";
         appealInfo += "\n**Explanation:** " + appeal.getExplanation();
         return appealInfo;
+    }
+
+    public boolean isAppeal(TextChannel channel) {
+        if(channel.getParent().getId().equals(module.getConfig().appealCategoryID)) return true;
+        return false;
     }
 
 }

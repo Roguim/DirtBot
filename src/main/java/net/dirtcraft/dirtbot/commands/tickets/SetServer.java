@@ -1,5 +1,6 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -22,7 +23,7 @@ public class SetServer extends CommandTicketStaff {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         boolean serverValid = false;
-        for(List<String> serverInfo : getModule().getConfig().servers) {
+        for(List<String> serverInfo : DirtBot.getConfig().servers) {
             if(serverInfo.get(1).toLowerCase().equals(args.get(0).toLowerCase())) {
                 serverValid = true;
             }

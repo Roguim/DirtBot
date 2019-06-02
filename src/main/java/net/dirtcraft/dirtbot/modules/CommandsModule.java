@@ -3,9 +3,7 @@ package net.dirtcraft.dirtbot.modules;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
 import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.misc.RandomCommand;
-import net.dirtcraft.dirtbot.commands.misc.Review;
-import net.dirtcraft.dirtbot.commands.misc.ShinyCSharp;
+import net.dirtcraft.dirtbot.commands.misc.*;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
@@ -14,6 +12,9 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @ModuleClass(classLiteral = CommandsModule.class, eventSubscriber = false)
 public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, CommandsModule.EmbedUtilsCommands> {
@@ -25,10 +26,19 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
 
         // Register Commands
         DirtBot.getCoreModule().registerCommands(
+                new Donate(this),
+                new Maps(this),
                 //new NotMyDepartment(this), Vetoed by Julian ):
+                new Ping(this),
+                new Purge(this),
                 new RandomCommand(this),
                 new Review(this),
-                new ShinyCSharp(this)
+                new Servers(this),
+                new ShinyCSharp(this),
+                new Site(this),
+                new Unstuck(this),
+                new Versions(this),
+                new Vote(this)
         );
     }
 
@@ -40,6 +50,11 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
+        List<List<String>> mapDownloadsListExample = new ArrayList<>();
+        mapDownloadsListExample.add(Arrays.asList("Server 1 Name", "Server 1 Download Link", "Server 1 Dates"));
+        mapDownloadsListExample.add(Arrays.asList("Server 2 Name", "Server 2 Download Link", "Server 2 Dates"));
+        spec.defineList("servers.old.maps", mapDownloadsListExample, p -> p instanceof ArrayList && ((ArrayList) p).size() == 3);
+
         setConfig(new ConfigurationManager<>(ConfigDataCommands.class, spec, "Commands"));
     }
 
@@ -50,6 +65,9 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
         public String embedTitle;
         @Path("discord.embeds.color")
         public int embedColor;
+
+        @Path("servers.old.maps")
+        public List<List<String>> oldMaps;
     }
 
     public class EmbedUtilsCommands extends EmbedUtils {

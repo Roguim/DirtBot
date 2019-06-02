@@ -1,5 +1,3 @@
-servers = [["Interactions", "int", "575136219302854657", "575172637421076490"], ["Pixelmon", "pixel", "575136278291546123", "575172652843663371"]]
-
 [database]
 	password = "YelJV97WrVibSJub"
 	user = "bot"

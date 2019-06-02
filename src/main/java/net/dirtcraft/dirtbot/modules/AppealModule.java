@@ -2,7 +2,10 @@ package net.dirtcraft.dirtbot.modules;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+import com.google.common.collect.Lists;
 import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.commands.appeals.AcceptAppeal;
+import net.dirtcraft.dirtbot.commands.appeals.RejectAppeal;
 import net.dirtcraft.dirtbot.data.Appeal;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
@@ -12,18 +15,23 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.appeals.AppealUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @ModuleClass(classLiteral = AppealModule.class)
@@ -34,6 +42,10 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
     @Override
     public void initialize() {
+        // Initialize Archives Folder
+        File archivesFolder = new File("archives" + File.separator + "appeals");
+        if(!archivesFolder.exists()) archivesFolder.mkdirs();
+
         // Initialize Incomplete Appeals List
         incompleteAppeals = new ArrayList<>();
 
@@ -48,6 +60,44 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
         // Ensure the appeals channel has the appropriate header
         printChannelHeader();
+
+        // Register Commands
+        DirtBot.getCoreModule().registerCommands(
+                new AcceptAppeal(this),
+                new RejectAppeal(this)
+        );
+
+        // Establish Tasks
+        if(getConfig().autocloseInterval > 0) {
+            TimerTask autoClose = new TimerTask() {
+                @Override
+                public void run() {
+                    for(Iterator<Appeal> iterator = incompleteAppeals.iterator(); iterator.hasNext();) {
+                        Appeal appeal = iterator.next();
+                        LocalDateTime appealCreatedTime = LocalDateTime.parse(DirtBot.getJda().getTextChannelById(appeal.getChannelID()).getTopic().replace("Appeal Incomplete | ", ""));
+                        LocalDateTime now = LocalDateTime.now();
+                        if(ChronoUnit.HOURS.between(appealCreatedTime, now) >= 24) {
+                            for(Member member : getAppealUtils().getAppealMembers(DirtBot.getJda().getTextChannelById(appeal.getChannelID()))) {
+                                member.getUser().openPrivateChannel().queue((privateChannel) -> {
+                                    EmbedBuilder dmEmbed = getEmbedUtils().getEmptyEmbed()
+                                            .addField("__Appeal Cancelled__", "Your appeal information was not filled out within 24 hours and was therefore deemed abandoned. Please submit a new appeal.", false);
+                                    privateChannel.sendMessage(dmEmbed.build()).queue();
+                                });
+                            }
+                            DirtBot.getJda().getTextChannelById(appeal.getChannelID()).delete().queue();
+                            getEmbedUtils().sendLog("Cancelled (Abandoned)", "The appeal information was not filled out within 24 hours and the appeal was therefore deemed abandoned.", appeal, DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMemberById(DirtBot.getJda().getSelfUser().getId()));
+                            iterator.remove();
+                        }
+                    }
+                }
+            };
+            Timer autoCloseTimer = new Timer();
+            autoCloseTimer.scheduleAtFixedRate(autoClose, 0, getConfig().autocloseInterval * 1000);
+        } else {
+            EmbedBuilder autoCloseNoInitEmbed = getEmbedUtils().getEmptyEmbed()
+                    .addField("__Initialization Event | Abandoned Appeal Close__", "Abandoned Appeal Close has been **disabled** due to autoclose interval being set to -1.\n To enable Abandoned Appeal Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
+            getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
+        }
     }
 
     @Override
@@ -62,6 +112,8 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
         spec.define("discord.channels.loggingChannelID", "");
 
         spec.define("discord.categories.appealCategoryID", "");
+
+        spec.define("intervals.autoclose", -1);
 
         setConfig(new ConfigurationManager<>(ConfigDataAppeals.class, spec, "Appeals"));
     }
@@ -108,6 +160,9 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
         @Path("discord.categories.appealCategoryID")
         public String appealCategoryID;
+
+        @Path("intervals.autoclose")
+        public int autocloseInterval;
     }
 
     public class EmbedUtilsAppeals extends EmbedUtils {
@@ -120,9 +175,58 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     .setFooter(getConfig().embedFooter, null)
                     .setTimestamp(Instant.now());
         }
+
+        public void sendLog(String eventName, String eventInfo, Appeal appeal, Member member) {
+            sendLog(eventName, eventInfo, DirtBot.getJda().getTextChannelById(appeal.getChannelID()), member);
+        }
+
+        public void sendLog(String eventName, String eventInfo, TextChannel appeal, Member member) {
+            sendLog(getEmptyEmbed()
+                    .addField("__Appeal Event | " + eventName + "__", eventInfo, false)
+                    .addField("__Appeal Information__",
+                            "**Appealer:** <@" + getAppealUtils().getAppealMembers(appeal).get(0).getUser().getId() + ">\n" +
+                                    "**Appeal:** <#" + appeal.getId() + ">\n" +
+                                    "**Action Completed By:** <@" + member.getUser().getId() + ">", false)
+                    .build());
+        }
+
+        public void sendLog(MessageEmbed message) {
+            DirtBot.getJda().getTextChannelById(getConfig().loggingChannelID).sendMessage(message).queue();
+        }
     }
 
     public AppealUtils getAppealUtils() { return appealUtils; }
+
+    public void archiveAppeal(List<Message> history, String username) {
+        List<String> lines = new ArrayList<>();
+            new Thread(() -> {
+                try {
+                    for(Message message : Lists.reverse(history)) {
+                        String line = "";
+                        line += message.getMember().getEffectiveName();
+                        line += " : ";
+                        line += message.getCreationTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
+                        line += "> ";
+                        line += message.getContentDisplay();
+                        for(MessageEmbed embed : message.getEmbeds()) {
+                            for(MessageEmbed.Field field : embed.getFields()) {
+                                line += " [" + field.getName() + "] ";
+                                line += field.getValue();
+                            }
+                        }
+                        line += "\n";
+                        lines.add(line);
+                    }
+                    java.nio.file.Path file = Paths.get("archives" + File.separator + "appeals" + File.separator + username.replaceAll("[^a-zA-Z0-9]", "") + ".txt");
+                    Files.write(file, lines, Charset.forName("UTF-8"));
+                    new ZipFile("archives" + File.separator + "appeals" + File.separator + LocalDate.now().format(DateTimeFormatter.ofPattern("W-LLLL-yyyy")) + ".zip").addFile(file.toFile(), new ZipParameters());
+                    file.toFile().delete();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    DirtBot.pokeTech(e);
+                }
+            }).start();
+    }
 
     private void printChannelHeader() {
         EmbedBuilder instructions = getEmbedUtils().getEmptyEmbed()
@@ -137,6 +241,8 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
         for (Message message : pinnedMessagesAppeal) {
             if (message.getEmbeds().size() > 0 && message.getAuthor().isBot() && message.getEmbeds().get(0).getFields().get(0).getName().contains(instructions.getFields().get(0).getName())) {
                 message.editMessage(instructions.build()).complete();
+                message.clearReactions().complete();
+                message.addReaction("\uD83D\uDCDD").queue();
                 messageFound = true;
             }
         }
@@ -158,6 +264,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                                 .addField("__Appeal Cancelled__", "Your appeal information was not filled out and the bot has since restarted. Please submit a new appeal.", false);
                         privateChannel.sendMessage(dmEmbed.build()).queue();
                     });
+                    getEmbedUtils().sendLog(getEmbedUtils().getEmptyEmbed().addField("Appeal Event | Deleted (Abandoned)", "The appeal information was not filled out before the bot restarted.", false).build());
                 }
                 channel.delete().queue();
             }
@@ -166,31 +273,41 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
     private void appealCreated(GuildMessageReactionAddEvent event) {
         Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
-        TextChannel appealChannel = (TextChannel) server.getController().createTextChannel(event.getMember().getEffectiveName())
+        for(TextChannel channel : server.getCategoryById(getConfig().appealCategoryID).getTextChannels()) {
+            if(channel.getName().toLowerCase().equals(event.getMember().getEffectiveName().toLowerCase())) {
+                getEmbedUtils().sendResponse(getEmbedUtils().getErrorEmbed("An appeal already exists for this user!\n\n Please click: <#" + channel.getId() + "> to view this appeal.").build(), DirtBot.getJda().getTextChannelById(getConfig().appealChannelID));
+                event.getReaction().removeReaction(event.getUser()).queue();
+                return;
+            }
+        }
+        server.getController().createTextChannel(event.getMember().getEffectiveName())
                 .setParent(server.getCategoryById(getConfig().appealCategoryID))
                 .addPermissionOverride(event.getMember(), EnumSet.of(Permission.MESSAGE_READ), null)
                 .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
                 .addPermissionOverride(server.getRoleById(server.getId()), null, EnumSet.of(Permission.MESSAGE_READ))
                 .setTopic("Appeal Incomplete | " + LocalDateTime.now())
-                .complete();
-        EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
-                .addField("__**Appeal Created**__", "Hello <@" + event.getMember().getUser().getId() + ">, \n I have created the channel <#" + appealChannel.getId() + "> for your appeal. Please follow the prompts in the aforementioned channel to submit your appeal.", false);
-        event.getChannel().sendMessage(response.build()).queue((responseMessage) -> {
-            responseMessage.delete().queueAfter(10, TimeUnit.SECONDS);
-        });
-        Appeal appeal = new Appeal(appealChannel.getId());
-        incompleteAppeals.add(appeal);
-        EmbedBuilder appealStartEmbed = getEmbedUtils().getEmptyEmbed()
-                .addField("__Player Username__", "Please send your Minecraft username below.", false);
-        appealChannel.sendMessage(appealStartEmbed.build()).queue((appealHeader) -> {
-            appealHeader.pin().queue();
-        });
-        event.getReaction().removeReaction(event.getUser()).queue();
+                .queue((appealChannel)-> {
+                    EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
+                            .addField("__**Appeal Created**__", "Hello <@" + event.getMember().getUser().getId() + ">, \n I have created the channel <#" + appealChannel.getId() + "> for your appeal. Please follow the prompts in the aforementioned channel to submit your appeal.", false);
+                    event.getChannel().sendMessage(response.build()).queue((responseMessage) -> {
+                        responseMessage.delete().queueAfter(10, TimeUnit.SECONDS);
+                    });
+                    Appeal appeal = new Appeal(appealChannel.getId());
+                    incompleteAppeals.add(appeal);
+                    EmbedBuilder appealStartEmbed = getEmbedUtils().getEmptyEmbed()
+                            .addField("__Player Username__", "Please send your Minecraft username below.", false);
+                    ((TextChannel) appealChannel).sendMessage(appealStartEmbed.build()).queue((appealHeader) -> {
+                        appealHeader.pin().queue();
+                    });
+                    event.getReaction().removeReaction(event.getUser()).queue();
+                    getEmbedUtils().sendLog("Created", "A new appeal has been submitted.", appeal, event.getMember());
+                });
         return;
     }
 
     private void ticketInformationFilled(MessageReceivedEvent me, GuildMessageReactionAddEvent re, Message message) {
-        for(Appeal appeal : incompleteAppeals) {
+        for(Iterator<Appeal> iterator = incompleteAppeals.iterator(); iterator.hasNext();) {
+            Appeal appeal = iterator.next();
             if (appeal.getChannelID().equals(message.getChannel().getId())) {
                 // Username Prompt Answered
                 if (appeal.getUsername() == null) {
@@ -203,21 +320,29 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     message.delete().queue();
                 // Server Prompt Answered
                 } else if(appeal.getServer() == null) {
-                    appeal.setServer(message.getContentDisplay().toUpperCase());
-                    message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
-                        EmbedBuilder appealPunishmentTypeEmbed = getEmbedUtils().getEmptyEmbed()
-                                .addField("__Punishment Type__", "Please select your punishment type:\n" +
-                                        "Mute [\uD83D\uDD07]\n" +
-                                        "Ban [\uD83D\uDEAB]", false);
-                        pinnedMessages.get(0).editMessage(appealPunishmentTypeEmbed.build()).queue((updatedMessage) -> {
-                            updatedMessage.addReaction("\uD83D\uDD07").queue();
-                            updatedMessage.addReaction("\uD83D\uDEAB").queue();
+                    boolean validServer = false;
+                    for(List<String> serverInfo : DirtBot.getConfig().servers) {
+                        if(serverInfo.get(0).toLowerCase().equals(message.getContentDisplay().toLowerCase()) || serverInfo.get(1).toLowerCase().equals(message.getContentDisplay().toLowerCase())) validServer = true;
+                    }
+                    if(validServer) {
+                        appeal.setServer(message.getContentDisplay().toUpperCase());
+                        message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                            EmbedBuilder appealPunishmentTypeEmbed = getEmbedUtils().getEmptyEmbed()
+                                    .addField("__Punishment Type__", "Please select your punishment type:\n" +
+                                            "Mute [\uD83D\uDD07]\n" +
+                                            "Ban [\uD83D\uDEAB]", false);
+                            pinnedMessages.get(0).editMessage(appealPunishmentTypeEmbed.build()).queue((updatedMessage) -> {
+                                updatedMessage.addReaction("\uD83D\uDD07").queue();
+                                updatedMessage.addReaction("\uD83D\uDEAB").queue();
+                            });
                         });
-                    });
+                    } else {
+                        getEmbedUtils().sendResponse(getEmbedUtils().getErrorEmbed("The given server is not valid! Please use the server code found in the server's gamechat channel name!").build(), me.getTextChannel());
+                    }
                     message.delete().queue();
                 // Punishment Type Answered
                 } else if(appeal.getPunishmentType() == null) {
-                    if(re.getReactionEmote().equals("\uD83D\uDD07") || re.getReactionEmote().equals("\uD83D\uDEAB")) {
+                    if(re.getReactionEmote().getName().equals("\uD83D\uDD07") || re.getReactionEmote().getName().equals("\uD83D\uDEAB")) {
                         switch(re.getReactionEmote().getName()) {
                             case "\uD83D\uDD07":
                                 appeal.setPunishmentType(Appeal.PunishmentType.MUTE);
@@ -261,9 +386,10 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     appeal.setExplanation(message.getContentRaw());
                     message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
                         EmbedBuilder appealHeaderEmbed = getEmbedUtils().getEmptyEmbed()
-                                .addField("__New Ban Appeal__", getAppealUtils().getAppealInfo(appeal), false);
+                                .addField("__New Appeal__", getAppealUtils().getAppealInfo(appeal), false);
                         pinnedMessages.get(0).editMessage(appealHeaderEmbed.build()).queue();
                     });
+                    iterator.remove();
                     message.getTextChannel().getManager().setTopic("Pending Appeal").queue();
                     message.getTextChannel().sendMessage("<@" + appeal.getStaff() + ">").queue();
                     message.delete().queue();

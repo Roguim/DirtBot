@@ -2,6 +2,7 @@ package net.dirtcraft.dirtbot.modules;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+import com.google.common.collect.Lists;
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.tickets.*;
 import net.dirtcraft.dirtbot.data.Ticket;
@@ -17,9 +18,17 @@ import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +44,10 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     public void initialize() {
         // Initialize Database Helper
         databaseHelper = new TicketsDatabaseHelper(this);
+
+        // Initialize Archives Folder
+        File archivesFolder = new File("archives" + File.separator + "tickets");
+        if(!archivesFolder.exists()) archivesFolder.mkdirs();
 
         // Initialize Notification Embeds List
         ticketNotificationEmbeds = new HashMap<>();
@@ -89,7 +102,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             autoCloseTimer.scheduleAtFixedRate(autoClose, 0, getConfig().autocloseInterval * 1000);
         } else {
             EmbedBuilder autoCloseNoInitEmbed = getEmbedUtils().getEmptyEmbed()
-                    .addField("__Initialization Event | Timer Close__", "Timer Close has been **disabled** due to timerclose interval being set to -1.\n To enable Timer Close, configure timercloser interval to an integer greater than 0 and restart the bot.", false);
+                    .addField("__Initialization Event | Timer Close__", "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
             getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
         }
         if(getConfig().gamesyncInterval > 0) {
@@ -132,11 +145,6 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         spec.define("discord.categories.supportCategoryID", "");
         spec.define("discord.categories.ownerSupportCategoryID", "");
-
-        List<List<String>> serverListExample = new ArrayList<>();
-        serverListExample.add(Arrays.asList("Server 1 Human Name", "Server 1 Code (int, sf3, etc.)", "Server 1 Support Category ID", "Server 1 Admin Support Channel ID"));
-        serverListExample.add(Arrays.asList("Server 2 Human Name", "Server 2 Code (int, sf3, etc.)", "Server 2 Support Category ID", "Server 2 Admin Support Channel ID"));
-        spec.defineList("servers", serverListExample, p -> p instanceof ArrayList && ((ArrayList) p).size() == 4);
 
         setConfig(new ConfigurationManager<>(ConfigDataTickets.class, spec, "Tickets"));
     }
@@ -217,9 +225,6 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         public String supportCategoryID;
         @Path("discord.categories.ownerSupportCategoryID")
         public String ownerSupportCategoryID;
-
-        @Path("servers")
-        public List<List<String>> servers;
     }
 
     public class EmbedUtilsTickets extends EmbedUtils {
@@ -267,7 +272,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         public void postTicketAdminMessage(Ticket ticket) {
             TextChannel adminListChannel = DirtBot.getJda().getTextChannelById(getConfig().adminSupportGenericChannelID);
             if(ticket.getServer(true) != null) {
-                for(List<String> serverInfo : getConfig().servers) {
+                for(List<String> serverInfo : DirtBot.getConfig().servers) {
                     if(serverInfo.get(1).equals(ticket.getServer(false))) {
                         adminListChannel = DirtBot.getJda().getTextChannelById(serverInfo.get(3));
                     }
@@ -293,7 +298,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         public void deleteTicketAdminMessage(Ticket ticket, String oldServer) {
             TextChannel adminListChannel = DirtBot.getJda().getTextChannelById(getConfig().adminSupportGenericChannelID);
             if(oldServer != null) {
-                for(List<String> serverInfo : getConfig().servers) {
+                for(List<String> serverInfo : DirtBot.getConfig().servers) {
                     if(serverInfo.get(1).equals(oldServer)) {
                         adminListChannel = DirtBot.getJda().getTextChannelById(serverInfo.get(3));
                     }
@@ -313,6 +318,53 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     public TicketsDatabaseHelper getDatabaseHelper() { return databaseHelper; }
 
     public HashMap<String, String> getTicketNotificationEmbeds() { return ticketNotificationEmbeds; }
+
+    public void archiveTicket(Ticket ticket) {
+        archiveTicket(DirtBot.getJda().getTextChannelById(ticket.getChannel()), ticket.getId());
+    }
+
+    public void archiveTicket(TextChannel channel, int ticketID) {
+            List<String> lines = new ArrayList<>();
+            channel.getIterableHistory().queue((messageHistory) ->
+                new Thread(() -> {
+                    try {
+                        for(Message message : Lists.reverse(messageHistory)) {
+                            String line = "";
+                            line += message.getMember().getEffectiveName();
+                            line += " : ";
+                            line += message.getCreationTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
+                            line += "> ";
+                            line += message.getContentDisplay();
+                            for(MessageEmbed embed : message.getEmbeds()) {
+                                for(MessageEmbed.Field field : embed.getFields()) {
+                                    line += " [" + field.getName() + "] ";
+                                    line += field.getValue();
+                                }
+                            }
+                            line += "\n";
+                            lines.add(line);
+                        }
+                        java.nio.file.Path file = Paths.get("archives" + File.separator + "tickets" + File.separator + ticketID + ".txt");
+                        Files.write(file, lines, Charset.forName("UTF-8"));
+                        getArchive(ticketID).addFile(file.toFile(), new ZipParameters());
+                        file.toFile().delete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        DirtBot.pokeTech(e);
+                    }
+                }).start());
+    }
+
+    public ZipFile getArchive(int ticketID) {
+        int diff = ticketID % 100;
+        try {
+            return new ZipFile("archives" + File.separator + "tickets" + File.separator + "Tickets-" + (ticketID - diff) + "-" + (ticketID - diff + 99) + ".zip");
+        } catch (Exception e) {
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
+        }
+        return null;
+    }
 
     private void printChannelHeader() {
         EmbedBuilder instructions = getEmbedUtils().getEmptyEmbed()
@@ -337,7 +389,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     private void printTicketNotificationEmbeds() {
         TextChannel notificationSubChannel = DirtBot.getJda().getTextChannelById(getConfig().notificationChannelID);
-        for(List<String> serverInfo : getConfig().servers) {
+        for(List<String> serverInfo : DirtBot.getConfig().servers) {
             boolean found = false;
             for(Message message : notificationSubChannel.getIterableHistory().complete()) {
                 if(message.getAuthor().isBot() && message.getEmbeds().size() > 0 && message.getEmbeds().get(0).getFields().size() > 0) {
@@ -373,7 +425,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             event.getMessage().delete().queue();
             return;
         }
-        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw(), event.getMember());
+        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9]", " "), event.getMember());
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
         event.getChannel().sendMessage(response.build()).queue((message) -> {

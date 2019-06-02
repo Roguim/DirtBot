@@ -1,5 +1,6 @@
 package net.dirtcraft.dirtbot.utils.tickets;
 
+import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 
@@ -54,7 +55,8 @@ public class TicketsDatabaseHelper {
                 // TODO Ticket Not Found After Insertion
             }
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return null;
     }
@@ -87,7 +89,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return null;
     }
@@ -120,7 +123,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return null;
     }
@@ -153,7 +157,8 @@ public class TicketsDatabaseHelper {
 
             return tickets;
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return null;
     }
@@ -184,7 +189,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -206,7 +212,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -229,7 +236,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -254,7 +262,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return timedCloses;
     }
@@ -275,7 +284,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -295,7 +305,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -319,7 +330,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 
@@ -341,7 +353,8 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return false;
     }
@@ -367,8 +380,37 @@ public class TicketsDatabaseHelper {
 
             return reason;
         } catch (SQLException e) {
-            // TODO Exception Handling
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
         return "No reason found.";
+    }
+
+    public int getLastAutoIncrementID() {
+        try {
+            // Establish Database Connection
+            Connection con = getDatabaseConnection();
+
+            // Prepare Query
+            PreparedStatement statement = con.prepareStatement("SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?");
+            statement.setString(1, module.getConfig().databaseUrl.substring(module.getConfig().databaseUrl.lastIndexOf("/") + 1));
+            statement.setString(2, "tickets");
+
+            // Execute Query
+            ResultSet results = statement.executeQuery();
+
+            // Clean Up & Return Data
+            if(results.next()) {
+                int result = results.getInt(1);
+                results.close();
+                statement.close();
+                con.close();
+                return result;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
+        }
+        return 0;
     }
 }

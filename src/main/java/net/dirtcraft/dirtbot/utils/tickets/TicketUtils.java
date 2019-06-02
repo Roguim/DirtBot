@@ -30,7 +30,7 @@ public class TicketUtils {
         if(ticket.getServer(true) == null) {
             ticketChannel.getManager().setParent(DirtBot.getJda().getCategoryById(module.getConfig().supportCategoryID)).queue();
         } else {
-            for (List<String> serverInfo : module.getConfig().servers) {
+            for (List<String> serverInfo : DirtBot.getConfig().servers) {
                 if(serverInfo.get(1).toLowerCase().equals(ticket.getServer(true).toLowerCase())) {
                     ticketChannel.getManager().setParent(DirtBot.getJda().getCategoryById(serverInfo.get(2))).queue();
                 }
@@ -86,12 +86,13 @@ public class TicketUtils {
     }
 
     public void closeTicket(Ticket ticket, String message, boolean review) {
+        module.archiveTicket(ticket);
         TextChannel ticketChannel = DirtBot.getJda().getTextChannelById(ticket.getChannel());
         module.getDatabaseHelper().removeAllConfirmationMessages(ticket.getId());
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
         if(review) {
             EmbedBuilder reviewDM = module.getEmbedUtils().getEmptyEmbed()
-                    .addField("__Ticket Closed__", "Youre ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
+                    .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
                             "```" + message + "```", false);
             for(Member member : getTicketMembers(ticket)) {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
@@ -114,7 +115,7 @@ public class TicketUtils {
     public boolean isTicketChannel(TextChannel channel) {
         if(channel.getParent().getId().equals(module.getConfig().supportCategoryID)) return true;
         if(channel.getParent().getId().equals(module.getConfig().ownerSupportCategoryID)) return true;
-        for(List<String> serverInfo : module.getConfig().servers) {
+        for(List<String> serverInfo : DirtBot.getConfig().servers) {
             if(serverInfo.get(2).equals(channel.getParent().getId())) return true;
         }
         return false;

@@ -5,8 +5,11 @@ import net.dirtcraft.dirtbot.modules.CoreModule;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.List;
 
 // You would rarely ever have to modify this class. New commands, features, etc. all belong in modules.
 public class DirtBot {
@@ -43,6 +46,9 @@ public class DirtBot {
         jda.addEventListener(coreModule);
         moduleRegistry.registerEventListeners(jda);
 
+        // Core Module Post-Init
+        coreModule.postInitialize();
+
         System.out.println("DirtBot is now initialized");
         jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DirtCord", "https://www.twitch.tv/dirtcraft/"));
 
@@ -57,4 +63,25 @@ public class DirtBot {
     public static CoreModule.ConfigDataCore getConfig() { return coreModule.getConfig(); }
 
     public static ModuleRegistry getModuleRegistry() { return moduleRegistry; }
+
+    public static void pokeTech(Exception e) {
+        DirtBot.getJda().getUserById("177618988761743360").openPrivateChannel().queue((privateChannel) -> {
+            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+            List<String> messageExceptions = new ArrayList<>();
+            String workingException = "";
+            for(String string : exception) {
+                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
+                else {
+                    messageExceptions.add(workingException);
+                    workingException = string;
+                }
+            }
+            if(!workingException.equals("")) messageExceptions.add(workingException);
+            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
+                for(String string : messageExceptions) {
+                    privateChannel.sendMessage("```" + string + "```").queue();
+                }
+            });
+        });
+    }
 }

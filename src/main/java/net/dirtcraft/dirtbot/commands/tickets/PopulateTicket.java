@@ -1,5 +1,6 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -22,19 +23,19 @@ public class PopulateTicket extends CommandTicketStaff {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         boolean serverValid = false;
-        for(List<String> serverInfo : getModule().getConfig().servers) {
+        for(List<String> serverInfo : DirtBot.getConfig().servers) {
             if(serverInfo.get(1).toLowerCase().equals(args.get(1).toLowerCase())) {
                 serverValid = true;
             }
         }
         if(serverValid) {
             Ticket ticket = getTicket(event);
-            String newName = String.join("-", args.subList(2, args.size()));
-            event.getTextChannel().getManager().setName(newName).queue();
             ticket.setUsername(args.get(0));
             getModule().getTicketUtils().setTicketServer(ticket, args.get(1).toLowerCase());
             getModule().getDatabaseHelper().modifyTicket(ticket);
             getModule().getEmbedUtils().updateTicketHeaderMessage(ticket);
+            String newName = String.join("-", args.subList(2, args.size())) + "-" + ticket.getId();
+            event.getTextChannel().getManager().setName(newName).queue();
 
             String eventInfo = "**Username:** " + ticket.getUsername(false) + "\n" +
                     "**Server::** " + ticket.getServer(false).toUpperCase() + "\n" +
@@ -54,14 +55,14 @@ public class PopulateTicket extends CommandTicketStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("populate"));
+        return new ArrayList<>(Arrays.asList("populate", "pop", "ticket"));
     }
 
     @Override
     public List<CommandArgument> args() {
         return new ArrayList<>(Arrays.asList(
            new CommandArgument("Username", "Minecraft Username", 0, 16),
-                new CommandArgument("Server", "Server code for the server (See the server's gamechat channel name for code", 1, 0),
+                new CommandArgument("Server", "Server code for the server (See the server's gamechat channel name for code)", 1, 0),
                 new CommandArgument("Name", "Desired name for the ticket. Spaces will be hyphenated", 1, 0)
         ));
     }

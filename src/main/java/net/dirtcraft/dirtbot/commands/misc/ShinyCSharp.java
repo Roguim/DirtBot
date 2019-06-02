@@ -30,8 +30,7 @@ public class ShinyCSharp implements ICommand {
 
     @Override
     public boolean hasPermission(Member member) {
-        if(member.getUser().getId().equals("248056002274918400")) return true;
-        else return false;
+        return member.getUser().getId().equals("248056002274918400");
     }
 
     @Override

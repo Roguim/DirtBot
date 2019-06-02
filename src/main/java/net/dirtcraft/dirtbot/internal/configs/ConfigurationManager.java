@@ -3,6 +3,7 @@ package net.dirtcraft.dirtbot.internal.configs;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.ObjectConverter;
 import com.electronwill.nightconfig.core.file.FileConfig;
+import net.dirtcraft.dirtbot.DirtBot;
 
 import java.util.function.Supplier;
 
@@ -46,6 +47,7 @@ public class ConfigurationManager<T extends IConfigData> {
                 return clazz.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
+                DirtBot.pokeTech(e);
             }
             return null;
         };

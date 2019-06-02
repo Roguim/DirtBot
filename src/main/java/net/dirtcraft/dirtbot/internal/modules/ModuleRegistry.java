@@ -27,6 +27,7 @@ public class ModuleRegistry {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            DirtBot.pokeTech(e);
         }
     }
 

@@ -1,10 +1,15 @@
+servers = [["Interactions", "int", "575136219302854657", "575172637421076490", "1.7.0"], ["Pixelmon", "pixel", "575136278291546123", "575172652843663371", "?"]]
 
 [discord]
 	serverID = "568566591722094612"
 
+	[discord.channels]
+		infoChannelID = "584426812612935690"
+
 	[discord.roles]
 		staffRoleID = "568628561456398348"
 		adminRoleID = "568628818965692429"
+		ownerRoleID = ""
 
 [bot]
 	prefix = "?"
