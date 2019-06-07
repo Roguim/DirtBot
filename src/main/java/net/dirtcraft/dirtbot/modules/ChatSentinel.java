@@ -11,9 +11,13 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
 
 import java.time.Instant;
+import java.util.ArrayList;
 
 @ModuleClass(classLiteral = ChatSentinel.class)
 public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, ChatSentinel.EmbedUtilsChatSentinel> {
@@ -71,6 +75,24 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! Please don't ping our staff team.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue();
                 event.getMessage().delete().queue();
             }
+        }
+    }
+
+    @Override
+    public void onGuildMemberNickChange(GuildMemberNickChangeEvent event) {
+        ArrayList<String> names = new ArrayList<>();
+        Role staffRole = event.getGuild().getRoleById(DirtBot.getConfig().staffRoleID);
+        event.getGuild().getMembersWithRoles(staffRole).forEach(staffMember -> {
+            if (staffMember.getNickname() == null) {
+                names.add(staffMember.getEffectiveName());
+            } else {
+                names.add(staffMember.getUser().getName());
+                names.add(staffMember.getEffectiveName());
+            }
+        });
+
+        if (names.contains(event.getNewNick())) {
+            event.getGuild().getController().setNickname(event.getMember(), event.getPrevNick()).queue();
         }
     }
 }
