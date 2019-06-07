@@ -32,8 +32,6 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
-        spec.define("discord.channels.notificationChannelID", "");
-
         setConfig(new ConfigurationManager<>(ConfigDataChatSentinel.class, spec, "ChatSentinel"));
     }
 
