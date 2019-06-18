@@ -55,7 +55,7 @@ public class Servers implements ICommand {
 
     @Override
     public List<String> aliases() {
-        return Arrays.asList("ip", "ips", "server", "servers", "join", "logon", "login", "play");
+        return Arrays.asList("ip", "ips", "servers", "join", "logon", "login", "play");
     }
 
     @Override
