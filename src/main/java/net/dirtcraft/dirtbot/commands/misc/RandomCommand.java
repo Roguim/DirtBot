@@ -48,8 +48,7 @@ public class RandomCommand implements ICommand {
 
     @Override
     public boolean hasPermission(Member member) {
-        if(member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return true;
-        else return false;
+        return member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID));
     }
 
     @Override
