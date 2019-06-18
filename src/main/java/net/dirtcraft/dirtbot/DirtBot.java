@@ -50,7 +50,7 @@ public class DirtBot {
         coreModule.postInitialize();
 
         System.out.println("DirtBot is now initialized");
-        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DirtCord", "https://www.twitch.tv/dirtcraft/"));
+        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
 
     }
 

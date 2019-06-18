@@ -14,7 +14,6 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import org.apache.logging.log4j.core.config.plugins.PluginConfiguration;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -64,16 +63,17 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
         Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
         Member ten = server.getMemberById("155688380162637825");
         Member julian = server.getMemberById("209865813849538560");
+
         if (!event.getMessage().getAuthor().isBot() && !event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
             if (event.getMessage().getMentionedMembers().contains(ten)) {
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! <@155688380162637825> doesn't like to be pinged.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue();
-                event.getMessage().delete().queue();
+                //event.getMessage().delete().queue();
             } else if (event.getMessage().getMentionedMembers().contains(julian)) {
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! <@209865813849538560> doesn't like to be pinged.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue();
-                event.getMessage().delete().queue();
+                //event.getMessage().delete().queue();
             } else if (event.getMessage().getMentionedRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! Please don't ping our staff team.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue();
-                event.getMessage().delete().queue();
+                //event.getMessage().delete().queue();
             }
         }
     }
