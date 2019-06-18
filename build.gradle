@@ -15,7 +15,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.dv8tion:JDA:3.8.3_462'
+    compile ('net.dv8tion:JDA:3.8.3_463') {
+        exclude module: 'opus-java'
+    }
     implementation 'org.apache.commons:commons-lang3:3.9'
     implementation 'org.mariadb.jdbc:mariadb-java-client:2.4.1'
     implementation 'com.electronwill.night-config:core:3.6.0'

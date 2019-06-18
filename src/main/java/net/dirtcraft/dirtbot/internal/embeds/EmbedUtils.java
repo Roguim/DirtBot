@@ -37,7 +37,7 @@ public abstract class EmbedUtils {
         return getEmptyEmbed()
                 .addField("__Review__",
                         "Please consider leaving a review on your experiences on DirtCraft and the support you have received.\n" +
-                                "We appriciate the review and hope you enjoy your time on DirtCraft!\n" +
+                                "We appreciate the review and hope you enjoy your time on DirtCraft!\n" +
                                 "[Click me to leave a **review!**](https://ftbservers.com/server/Z0DoHV0S/dirtcraft-modded-servers)", false).build();
     }
 }

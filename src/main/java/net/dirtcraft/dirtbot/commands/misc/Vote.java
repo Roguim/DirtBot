@@ -24,10 +24,11 @@ public class Vote implements ICommand {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
-                .addField("__Voting Links__", "[**Click me to vote on FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/vote)\n" +
-                        "[**Click me to vote on Minecraft-MP**](https://minecraft-mp.com/server/206809/vote/)\n" +
-                        "**Rewards received while offline will be applied to your account upon logging in.**",
-                        false).build();
+                .addField("__Voting Links__", "[**Click me to vote on Minecraft-MP**](https://minecraft-mp.com/server/206809/vote/)\n" +
+                                " [**Click me to vote on FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/vote)",
+                        false)
+                .setFooter("Offline votes will be credited to your account upon login", null)
+                .build();
         event.getTextChannel().sendMessage(response).queue();
         return true;
     }

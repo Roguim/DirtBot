@@ -10,6 +10,7 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.time.Instant;
@@ -107,7 +108,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.GREEN)
                 .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
-                .setDescription("You are now subscribed to updates regarding the ModPack **" + event.getReactionEmote().getName() + "**")
+                .setDescription("You are now subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**")
                 .setTimestamp(Instant.now());
         event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
@@ -119,7 +120,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.RED)
                 .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
-                .setDescription("You are no longer subscribed to updates regarding the ModPack **" + event.getReactionEmote().getName() + "**")
+                .setDescription("You are no longer subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**")
                 .setTimestamp(Instant.now());
         event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }

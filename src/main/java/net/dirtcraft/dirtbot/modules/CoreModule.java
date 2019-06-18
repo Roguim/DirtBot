@@ -110,7 +110,7 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         // Info Channel Header
         TextChannel infoChannel = DirtBot.getJda().getTextChannelById(getConfig().infoChannelID);
         infoChannel.getIterableHistory().queue((messageHistory) -> {
-            for(Message message : messageHistory) message.delete().queue();
+            for (Message message : messageHistory) message.delete().queue();
             infoChannel.sendMessage(getConfig().botPrefix + "servers").queue((serversCall) ->
                     infoChannel.sendMessage(getConfig().botPrefix + "shop").queue((shopCall) ->
                             infoChannel.sendMessage(getConfig().botPrefix + "vote").queue((voteCall) -> {

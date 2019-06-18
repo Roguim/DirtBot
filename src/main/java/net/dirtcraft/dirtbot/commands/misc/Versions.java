@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,20 +23,17 @@ public class Versions implements ICommand {
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        String names = "";
-        String versions = "";
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<String> versions = new ArrayList<>();
+
         for(int i = 0; i < DirtBot.getConfig().servers.size(); i++) {
             List<String> server = DirtBot.getConfig().servers.get(i);
-            names += server.get(0);
-            versions += "`" + server.get(4) + "`";
-            if(!(i + 1 == DirtBot.getConfig().servers.size())) {
-                names += "\n";
-                versions += "\n";
-            }
+            names.add(server.get(0));
+            versions.add(server.get(4));
         }
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
-                .addField("__Modpacks__", names, true)
-                .addField("__Versions__", versions, true)
+                .addField("__ModPacks__", String.join("\n", names), true)
+                .addField("__Versions__", String.join("\n", versions), true)
                 .build();
         event.getTextChannel().sendMessage(response).queue();
         return true;

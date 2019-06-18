@@ -23,7 +23,7 @@ public class AcceptAppeal extends CommandAppealStaff {
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         String message = String.join(" ", args);
         MessageEmbed responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
-                .addField("__Appeal Accepted__", "Your appeal has been accepted by <@" + event.getMember().getUser().getId() + "> with the following message:\n + '''" + message + "'''", false)
+                .addField("__Appeal Accepted__", "Your appeal has been accepted by <@" + event.getMember().getUser().getId() + "> with the following message:\n```" + message + "```", false)
                 .build();
         event.getTextChannel().getIterableHistory().queue((iterableHistory) -> {
             String appealerName = "";
@@ -32,7 +32,7 @@ public class AcceptAppeal extends CommandAppealStaff {
                 appealerName = member.getEffectiveName();
             }
             getModule().archiveAppeal(iterableHistory, appealerName);
-            getModule().getEmbedUtils().sendLog("Accepted", "An appeal has been accepted with the following message:\n\n" + message, event.getTextChannel(), event.getMember());
+            getModule().getEmbedUtils().sendLog("Accepted", "An appeal has been accepted with the following message:\n```" + message + "```", event.getTextChannel(), event.getMember());
             event.getTextChannel().delete().queue();
         });
         return true;
