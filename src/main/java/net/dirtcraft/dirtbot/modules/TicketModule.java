@@ -425,7 +425,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             event.getMessage().delete().queue();
             return;
         }
-        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9]", " "), event.getMember());
+        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), event.getMember());
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
         event.getChannel().sendMessage(response.build()).queue((message) -> {
