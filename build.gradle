@@ -1,17 +1,16 @@
 plugins {
     id'com.github.johnrengelman.shadow' version '4.0.4'
+    id 'java'
 }
 
 group 'net.dirtcraft'
-version '1.0-SNAPSHOT'
-
-apply plugin: 'java'
+version '3.0'
 
 sourceCompatibility = 1.8
 
 repositories {
-    mavenCentral()
     jcenter()
+    mavenCentral()
 }
 
 dependencies {

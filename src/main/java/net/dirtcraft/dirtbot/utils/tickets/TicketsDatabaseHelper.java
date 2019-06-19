@@ -4,6 +4,7 @@ import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 
+import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,12 +34,14 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message) VALUES (?, ?)");
+            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message, discordid) VALUES (?, ?, ?)");
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getMessage());
+            statement.setString(3, ticket.getDiscordID(true));
 
             // Create Ticket
             statement.execute();
+
             statement.close();
 
             // Get latest ticket
@@ -79,7 +82,14 @@ public class TicketsDatabaseHelper {
             // Execute Query
             ResultSet results = statement.executeQuery();
             if(results.next()) {
-                return new Ticket(results.getInt("id"), true, results.getString("message"), results.getString("username"), results.getString("server"), results.getString("channel"), Ticket.Level.valueOf(results.getString("level").toUpperCase()));
+                return new Ticket(
+                        results.getInt("id"),
+                        true, results.getString("message"),
+                        results.getString("username"),
+                        results.getString("server"),
+                        results.getString("channel"),
+                        Ticket.Level.valueOf(results.getString("level").toUpperCase()),
+                        results.getString("discordid"));
             } else {
                 // TODO Something Went Wrong (No Ticket Found)
             }
@@ -102,6 +112,8 @@ public class TicketsDatabaseHelper {
      * @return The fetched ticket
      */
     public Ticket getTicket(String channel) {
+        Ticket ticket;
+
         try {
             // Establish Database Connection
             Connection con = getDatabaseConnection();
@@ -112,9 +124,18 @@ public class TicketsDatabaseHelper {
 
             // Execute Query
             ResultSet results = statement.executeQuery();
-            if(results.next()) {
-                return new Ticket(results.getInt("id"), true, results.getString("message"), results.getString("username"), results.getString("server"), results.getString("channel"), Ticket.Level.valueOf(results.getString("level").toUpperCase()));
+
+            if (results.next()) {
+                ticket = new Ticket(
+                        results.getInt("id"),
+                        true,
+                        results.getString("message"),
+                        results.getString("username"),
+                        results.getString("server"), results.getString("channel"),
+                        Ticket.Level.valueOf(results.getString("level").toUpperCase()),
+                        results.getString("discordid"));
             } else {
+                ticket = null;
                 // TODO Something Went Wrong (No Ticket Found)
             }
 
@@ -125,8 +146,9 @@ public class TicketsDatabaseHelper {
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
+            ticket = null;
         }
-        return null;
+        return ticket;
     }
 
     /**
@@ -134,7 +156,9 @@ public class TicketsDatabaseHelper {
      *
      * @return A list of unassigned tickets
      */
+
     public List<Ticket> getGameTickets() {
+        List<Ticket> tickets = new ArrayList<>();
         try {
             // Establish Database Connection
             Connection con = getDatabaseConnection();
@@ -145,9 +169,16 @@ public class TicketsDatabaseHelper {
             // Fetch Results
             ResultSet results = statement.executeQuery();
 
-            List<Ticket> tickets = new ArrayList<>();
             while (results.next()) {
-                tickets.add(new Ticket(results.getInt("id"), true, results.getString("message"), results.getString("username"), results.getString("server"), results.getString("channel"), Ticket.Level.valueOf(results.getString("level"))));
+                tickets.add(new Ticket(
+                        results.getInt("id"),
+                        true,
+                        results.getString("message"),
+                        results.getString("username"),
+                        results.getString("server"),
+                        results.getString("channel"),
+                        Ticket.Level.valueOf(results.getString("level")),
+                        results.getString("discordid")));
             }
 
             // Clean Up
@@ -155,12 +186,47 @@ public class TicketsDatabaseHelper {
             statement.close();
             con.close();
 
-            return tickets;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
+            tickets = null;
         }
-        return null;
+        return tickets;
+    }
+
+    /**
+     * Checks if the user has an open ticket
+     *
+     * @return A boolean if the user has a ticket
+     */
+
+    public boolean hasOpenTicket(String discordID) {
+        boolean hasOpenTicket;
+        try {
+            Connection connection = getDatabaseConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT open FROM tickets WHERE discordid = '" + discordID + "' ORDER BY id DESC");
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                hasOpenTicket = false;
+            } else {
+                hasOpenTicket = false;
+                while (rs.next()) {
+                    if (rs.getBoolean("open")) hasOpenTicket = true;
+                }
+            }
+
+            rs.close();
+            ps.close();
+            connection.close();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeTech(exception);
+            hasOpenTicket = false;
+        }
+
+        return hasOpenTicket;
     }
 
     /**
@@ -174,24 +240,61 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open=?, username=?, server=?, channel=?, level=? WHERE id=?");
+            PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open=?, username=?, server=?, channel=?, level=?, discordid=? WHERE id=?");
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getUsername(true));
             statement.setString(3, ticket.getServer(true));
             statement.setString(4, ticket.getChannel());
             statement.setString(5, ticket.getLevel().toString().toLowerCase());
-            statement.setInt(6, ticket.getId());
+            statement.setString(6, ticket.getDiscordID(true));
+            statement.setInt(7, ticket.getId());
 
             // Push the Changes & Clean Up
             if (!statement.execute()) {
                 // TODO Something went wrong
             }
+
             statement.close();
             con.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
         }
+    }
+
+    /**
+     * Updates a ticket in the database.
+     *
+     * @param ticket The ticket with updated data
+     */
+
+    @Nullable
+    public String getLastTicketChannelID(String discordID) {
+
+        String channelID;
+
+        try {
+            Connection connection = getDatabaseConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT channel FROM tickets WHERE discordid = '" + discordID + "' ORDER BY id DESC");
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                channelID = null;
+            } else {
+                channelID = rs.getString("channel");
+            }
+
+            rs.close();
+            ps.close();
+            connection.close();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeTech(exception);
+            channelID = null;
+        }
+
+        return channelID;
     }
 
     public void addConfirmationMessage(int ticketId, String confirmationMessageId, String reason) {
@@ -209,6 +312,7 @@ public class TicketsDatabaseHelper {
             if (!statement.execute()) {
                 // TODO Something went wrong
             }
+
             statement.close();
             con.close();
         } catch (SQLException e) {
@@ -264,6 +368,7 @@ public class TicketsDatabaseHelper {
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
+            timedCloses = null;
         }
         return timedCloses;
     }

@@ -414,10 +414,23 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         // If a staff member is using ignore, don't go any further
         if(event.getMessage().getContentRaw().startsWith(DirtBot.getConfig().botPrefix + "ignore") && event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return;
 
+        if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId())) {
+            EmbedBuilder response;
+            response = getEmbedUtils().getErrorEmbed(databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) != null ?
+                    "You already have ticket <#" + databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) + "> open!" :
+                    "You already have a ticket open!");
+            event.getChannel().sendMessage(response.build()).queue((message) -> {
+                message.delete().queueAfter(10, TimeUnit.SECONDS);
+            });
+
+            event.getMessage().delete().queue();
+            return;
+        }
+
         // Ensure length is within boundaries
         if (event.getMessage().getContentRaw().length() > 1024) {
             EmbedBuilder response = getEmbedUtils().getErrorEmbed(
-                    "Ticket length exceeds the maximum. The maximum length if 1024 characters, and this ticket is **" + event.getMessage().getContentRaw().length() + "**!" +
+                    "Ticket length exceeds the maximum length of 1024 characters, and this ticket is **" + event.getMessage().getContentRaw().length() + "**!" +
                             "\nPlease use a short message and expand upon your problem once the ticket has been created.");
             event.getChannel().sendMessage(response.build()).queue((message) -> {
                 message.delete().queueAfter(10, TimeUnit.SECONDS);
@@ -425,6 +438,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             event.getMessage().delete().queue();
             return;
         }
+
         TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), event.getMember());
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);

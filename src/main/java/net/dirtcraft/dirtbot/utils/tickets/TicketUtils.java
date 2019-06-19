@@ -45,7 +45,7 @@ public class TicketUtils {
     }
 
     public TextChannel createTicket(String message, Member member) {
-        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message)), member);
+        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message, member.getUser().getId())), member);
     }
 
     public TextChannel createTicket(Ticket ticket, Member member) {
