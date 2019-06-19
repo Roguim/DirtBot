@@ -2,6 +2,7 @@ package net.dirtcraft.dirtbot;
 
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
+import net.dirtcraft.dirtbot.modules.VerificationModule;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -46,6 +47,9 @@ public class DirtBot {
         jda.addEventListener(coreModule);
         moduleRegistry.registerEventListeners(jda);
 
+        // Update verification channel message
+        moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
+
         // Core Module Post-Init
         coreModule.postInitialize();
 
@@ -66,6 +70,28 @@ public class DirtBot {
 
     public static void pokeTech(Exception e) {
         DirtBot.getJda().getUserById("177618988761743360").openPrivateChannel().queue((privateChannel) -> {
+            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+            List<String> messageExceptions = new ArrayList<>();
+            String workingException = "";
+            for(String string : exception) {
+                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
+                else {
+                    messageExceptions.add(workingException);
+                    workingException = string;
+                }
+            }
+            if(!workingException.equals("")) messageExceptions.add(workingException);
+            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
+                for(String string : messageExceptions) {
+                    privateChannel.sendMessage("```" + string + "```").queue();
+                }
+            });
+        });
+        pokeJulian(e);
+    }
+
+    private static void pokeJulian(Exception e) {
+        DirtBot.getJda().getUserById("209865813849538560").openPrivateChannel().queue((privateChannel) -> {
             String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
             List<String> messageExceptions = new ArrayList<>();
             String workingException = "";
