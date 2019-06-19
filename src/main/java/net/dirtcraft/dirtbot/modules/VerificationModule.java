@@ -38,9 +38,9 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
 
         spec.define("discord.embeds.footer", "DirtCraft's DirtBot | 2019");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
-        spec.define("discord.embeds.color", 12918777);
+        spec.define("discord.embeds.color", 16711680);
 
-        spec.define("discord.channels.verificationChannelID", "591014628897849364");
+        spec.define("discord.channels.verificationChannelID", "");
 
         setConfig(new ConfigurationManager<>(ConfigDataVerification.class, spec, "Verification"));
     }

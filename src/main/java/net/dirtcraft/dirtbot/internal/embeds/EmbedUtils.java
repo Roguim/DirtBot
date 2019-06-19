@@ -15,6 +15,7 @@ public abstract class EmbedUtils {
 
     public EmbedBuilder getErrorEmbed(String error) {
         return getEmptyEmbed()
+                .setColor(10223635)
                 .addField("__Error!__", error, false);
     }
 
