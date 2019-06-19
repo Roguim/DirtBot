@@ -80,7 +80,7 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
         if (event.getUser().isBot() || event.getUser().isFake()) return;
         if (!event.getChannel().getId().equals(getConfig().verificationChannelID)) return;
 
-        event.getReaction().removeReaction().queue();
+        event.getReaction().removeReaction(event.getUser()).queue();
 
         String discordID = event.getUser().getId();
 
