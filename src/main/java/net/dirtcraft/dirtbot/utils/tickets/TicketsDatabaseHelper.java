@@ -29,34 +29,36 @@ public class TicketsDatabaseHelper {
      * @return The given ticket with the ID populated
      */
     public Ticket createTicket(Ticket ticket) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message, discordid) VALUES (?, ?, ?)");
+            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message, discordid) VALUES (?, ?, ?)")) {
+        
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getMessage());
             statement.setString(3, ticket.getDiscordID(true));
 
             // Create Ticket
             statement.execute();
-
-            statement.close();
-
+            
             // Get latest ticket
-            PreparedStatement statement2 = con.prepareStatement("SELECT LAST_INSERT_ID()");
-            ResultSet results = statement2.executeQuery();
-
-            if (results.next()) {
-                ticket.setId(results.getInt(1));
-                results.close();
-                statement2.close();
-                con.close();
-                return ticket;
-            }/* else {
-                // TODO Ticket Not Found After Insertion
-            }*/
+            try (
+                PreparedStatement statement2 = con.prepareStatement("SELECT LAST_INSERT_ID()");
+                ResultSet results = statement2.executeQuery()) {
+            
+                if (results.next()) {
+                    ticket.setId(results.getInt(1));
+                    return ticket;
+                }/* else {
+                    // TODO Ticket Not Found After Insertion
+                }*/
+            
+            } catch (SQLException e) {
+            e.printStackTrace();
+            DirtBot.pokeTech(e);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
