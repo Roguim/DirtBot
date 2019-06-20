@@ -34,6 +34,8 @@ public class Servers implements ICommand {
         }
 
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
+                .setFooter("You can connect to any server through HUB", null)
                 .setImage("https://cdn.discordapp.com/attachments/470444805931925518/545741732541628416/Max-Resolution.gif")
                 .addField("__ModPacks__", String.join("\n", names), true)
                 .addField("__IPs__", String.join("\n", ips), true)

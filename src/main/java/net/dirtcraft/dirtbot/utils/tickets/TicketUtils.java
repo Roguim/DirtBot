@@ -44,8 +44,8 @@ public class TicketUtils {
         updateCategory(ticket, ticket.getServer(true));
     }
 
-    public TextChannel createTicket(String message, Member member) {
-        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message, member.getUser().getId())), member);
+    public TextChannel createTicket(String message, Member member, String username) {
+        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message, member.getUser().getId(), username)), member);
     }
 
     public TextChannel createTicket(Ticket ticket, Member member) {

@@ -13,6 +13,7 @@ import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.tickets.TicketUtils;
 import net.dirtcraft.dirtbot.utils.tickets.TicketsDatabaseHelper;
+import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -102,7 +103,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             autoCloseTimer.scheduleAtFixedRate(autoClose, 0, getConfig().autocloseInterval * 1000);
         } else {
             EmbedBuilder autoCloseNoInitEmbed = getEmbedUtils().getEmptyEmbed()
-                    .addField("__Initialization Event | Timer Close__", "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
+                    .addField("__Initialization Event | Timer Close__",
+                            "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
             getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
         }
         if(getConfig().gamesyncInterval > 0) {
@@ -414,11 +416,12 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         // If a staff member is using ignore, don't go any further
         if(event.getMessage().getContentRaw().startsWith(DirtBot.getConfig().botPrefix + "ignore") && event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return;
 
-        if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId())) {
+        if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId()) && !getVerificationDB().isVerified(event.getMember().getUser().getId())) {
             EmbedBuilder response;
+            String verificationChannelID = getVerification().getConfig().verificationChannelID;
             response = getEmbedUtils().getErrorEmbed(databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) != null ?
-                    "You already have ticket <#" + databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) + "> open!" :
-                    "You already have a ticket open!");
+                    "You already have ticket <#" + databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) + "> open!\nVerify in <#" + verificationChannelID + "> to create more!" :
+                    "You already have a ticket open!\nVerify in <#" + verificationChannelID + "> to create more!");
             event.getChannel().sendMessage(response.build()).queue((message) -> {
                 message.delete().queueAfter(10, TimeUnit.SECONDS);
             });
@@ -439,7 +442,9 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             return;
         }
 
-        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), event.getMember());
+        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "),
+                event.getMember(),
+                getVerificationDB().getUsernamefromUUID(getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId())));
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
         event.getChannel().sendMessage(response.build()).queue((message) -> {
@@ -512,5 +517,13 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             EmbedBuilder unsubscriptionNotification = getEmbedUtils().getEmptyEmbed().addField("__Unubscribed__", "You have successfully unsubscribed to notifications for **" + server + "** tickets!", false);
             event.getUser().openPrivateChannel().queue((privateChannel) -> privateChannel.sendMessage(unsubscriptionNotification.build()).queue());
         }
+    }
+
+    private VerificationDatabaseHelper getVerificationDB() {
+        return DirtBot.getModuleRegistry().getModule(VerificationModule.class).getVerificationDatabase();
+    }
+
+    private VerificationModule getVerification() {
+        return DirtBot.getModuleRegistry().getModule(VerificationModule.class);
     }
 }

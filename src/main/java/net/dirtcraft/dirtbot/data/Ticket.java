@@ -22,8 +22,8 @@ public class Ticket {
         this.discordid = discordid;
     }
 
-    public Ticket(String message, String discordID) {
-        this(0, true, message, null, null, null, Level.NORMAL, discordID);
+    public Ticket(String message, String discordID, String username) {
+        this(0, true, message, username, null, null, Level.NORMAL, discordID);
     }
 
     public int getId() { return id; }

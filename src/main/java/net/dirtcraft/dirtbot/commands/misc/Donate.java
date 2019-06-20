@@ -24,6 +24,8 @@ public class Donate implements ICommand {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
+                .setFooter(null, null)
                 .addField("__DirtCraft Support Shop__", "[**Click me to open the DirtStore**](https://store.dirtcraft.net)",
                         false).build();
         event.getTextChannel().sendMessage(response).queue();

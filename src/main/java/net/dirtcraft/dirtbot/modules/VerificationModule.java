@@ -11,6 +11,7 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 import net.dirtcraft.dirtbot.utils.verification.VerificationUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 
 import java.time.Instant;
@@ -90,6 +91,9 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
             verificationCode = !database.isVerified(discordID) ? database.getLastCode(discordID) : null;
         } else {
             verificationCode = VerificationUtils.getSaltString();
+            while (database.codeExists(verificationCode)) {
+                verificationCode = VerificationUtils.getSaltString();
+            }
         }
 
         if (!database.hasRecord(discordID)) database.createRecord(discordID, verificationCode);
@@ -105,16 +109,17 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
     public void updateChannelMessage() {
 
         EmbedBuilder verificationMessage = getEmbedUtils().getEmptyEmbed()
-                .setDescription("Select :white_check_mark: to verify your account");
+                .setTimestamp(null)
+                .setDescription("Select :white_check_mark: to link your Discord & Minecraft account");
 
-        if (DirtBot.getJda()
+        TextChannel verificationChannel = DirtBot.getJda()
                 .getGuildById(DirtBot.getConfig().serverID)
-                .getTextChannelById(getConfig().verificationChannelID)
-                .hasLatestMessage()) {
-            DirtBot.getJda()
-                    .getGuildById(DirtBot.getConfig().serverID)
-                    .getTextChannelById(getConfig().verificationChannelID)
-                    .getIterableHistory().forEach(messages -> messages.delete().complete());
+                .getTextChannelById(getConfig().verificationChannelID);
+
+        if (verificationChannel.hasLatestMessage()) {
+            verificationChannel
+                    .getIterableHistory()
+                    .forEach(messages -> messages.delete().complete());
         }
 
         DirtBot.getJda()
@@ -125,5 +130,9 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
                     message.addReaction("\u2705").queue();
                     message.pin().queue();
                 });
+    }
+
+    public VerificationDatabaseHelper getVerificationDatabase() {
+        return database;
     }
 }
