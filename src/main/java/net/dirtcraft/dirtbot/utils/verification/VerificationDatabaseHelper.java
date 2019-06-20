@@ -20,7 +20,10 @@ public class VerificationDatabaseHelper {
 
     public void createRecord(String discordID, String code) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("INSERT INTO verification (discordid, code) VALUES ('" + discordID + "', '" + code + "')")) {
+             PreparedStatement ps = connection.prepareStatement("INSERT INTO verification (discordid, code) VALUES (?, ?)")) {
+
+            ps.setString(1, discordID);
+            ps.setString(2, code);
 
             ps.execute();
 
@@ -32,10 +35,16 @@ public class VerificationDatabaseHelper {
 
     public boolean hasRecord(String discordID) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = '" + discordID + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
 
-            return rs.next();
+            ps.setString(1, discordID);
+            ResultSet rs = ps.executeQuery();
+
+            boolean result = rs.next();
+
+            rs.close();
+
+            return result;
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -46,12 +55,19 @@ public class VerificationDatabaseHelper {
 
     public String getLastCode(String discordID) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT code FROM verification WHERE discordid = '" + discordID + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT code FROM verification WHERE discordid = ?")) {
 
-            if (!rs.next()) return null;
+            ps.setString(1, discordID);
+            ResultSet rs = ps.executeQuery();
 
-            return rs.getString("code");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String code = rs.getString("code");
+                rs.close();
+                return code;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -62,12 +78,19 @@ public class VerificationDatabaseHelper {
 
     public boolean isVerified(String discordID) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = '" + discordID + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
 
-            if (!rs.next()) return false;
+            ps.setString(1, discordID);
+            ResultSet rs = ps.executeQuery();
 
-            return rs.getString("uuid") != null;
+            if (!rs.next()) {
+                rs.close();
+                return false;
+            } else {
+                boolean result = rs.getString("uuid") != null;
+                rs.close();
+                return result;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -78,10 +101,15 @@ public class VerificationDatabaseHelper {
 
     public boolean codeExists(String code) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = '" + code + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = ?")) {
+            ps.setString(1, code);
+            ResultSet rs = ps.executeQuery();
 
-            return rs.next();
+            boolean result = rs.next();
+
+            rs.close();
+
+            return result;
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -92,12 +120,18 @@ public class VerificationDatabaseHelper {
     @Nullable
     public String getUUIDfromDiscordID(String discordID) {
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = '" + discordID + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = ?")) {
+            ps.setString(1, discordID);
+            ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) return null;
-
-            return rs.getString("uuid");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String uuid = rs.getString("uuid");
+                rs.close();
+                return uuid;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -113,9 +147,14 @@ public class VerificationDatabaseHelper {
              PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = '" + uuid + "'");
              ResultSet rs = ps.executeQuery()) {
 
-            if (!rs.next()) return null;
-
-            return rs.getString("Username");
+            if (!rs.next()) {
+                rs.close();
+                return null;
+            } else {
+                String username = rs.getString("Username");
+                rs.close();
+                return username;
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();

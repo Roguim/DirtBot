@@ -54,9 +54,9 @@ public class TicketsDatabaseHelper {
                 statement2.close();
                 con.close();
                 return ticket;
-            } else {
+            }/* else {
                 // TODO Ticket Not Found After Insertion
-            }
+            }*/
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -71,18 +71,20 @@ public class TicketsDatabaseHelper {
      * @return The fetched ticket
      */
     public Ticket getTicket(int id) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE id=?");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE id=?")) {
             statement.setInt(1, id);
 
             // Execute Query
             ResultSet results = statement.executeQuery();
+
+            Ticket ticket;
             if(results.next()) {
-                return new Ticket(
+                ticket = new Ticket(
                         results.getInt("id"),
                         true, results.getString("message"),
                         results.getString("username"),
@@ -91,13 +93,14 @@ public class TicketsDatabaseHelper {
                         Ticket.Level.valueOf(results.getString("level").toUpperCase()),
                         results.getString("discordid"));
             } else {
+                ticket = null;
                 // TODO Something Went Wrong (No Ticket Found)
             }
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
+
+            return ticket;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -114,12 +117,12 @@ public class TicketsDatabaseHelper {
     public Ticket getTicket(String channel) {
         Ticket ticket;
 
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE channel=?");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE channel = ?")) {
             statement.setString(1, channel);
 
             // Execute Query
@@ -141,8 +144,6 @@ public class TicketsDatabaseHelper {
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -159,12 +160,14 @@ public class TicketsDatabaseHelper {
 
     public List<Ticket> getGameTickets() {
         List<Ticket> tickets = new ArrayList<>();
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE open=1 AND channel IS NULL");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE open = ? AND channel IS NULL")) {
+
+            statement.setBoolean(1, true);
 
             // Fetch Results
             ResultSet results = statement.executeQuery();
@@ -183,8 +186,6 @@ public class TicketsDatabaseHelper {
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -202,9 +203,11 @@ public class TicketsDatabaseHelper {
 
     public boolean hasOpenTicket(String discordID) {
         boolean hasOpenTicket;
-        try {
+        try (
             Connection connection = getDatabaseConnection();
-            PreparedStatement ps = connection.prepareStatement("SELECT open FROM tickets WHERE discordid = '" + discordID + "' ORDER BY id DESC");
+            PreparedStatement ps = connection.prepareStatement("SELECT open FROM tickets WHERE discordid = ? ORDER BY id DESC")) {
+            ps.setString(1, discordID);
+
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -217,8 +220,6 @@ public class TicketsDatabaseHelper {
             }
 
             rs.close();
-            ps.close();
-            connection.close();
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -235,12 +236,11 @@ public class TicketsDatabaseHelper {
      * @param ticket The ticket with updated data
      */
     public void modifyTicket(Ticket ticket) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
-
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open=?, username=?, server=?, channel=?, level=?, discordid=? WHERE id=?");
+            PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open=?, username=?, server=?, channel=?, level=?, discordid=? WHERE id=?")) {
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getUsername(true));
             statement.setString(3, ticket.getServer(true));
@@ -249,13 +249,15 @@ public class TicketsDatabaseHelper {
             statement.setString(6, ticket.getDiscordID(true));
             statement.setInt(7, ticket.getId());
 
+            statement.executeUpdate();
+
+            /*
             // Push the Changes & Clean Up
             if (!statement.execute()) {
                 // TODO Something went wrong
             }
+            */
 
-            statement.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -265,7 +267,7 @@ public class TicketsDatabaseHelper {
     /**
      * Updates a ticket in the database.
      *
-     * @param ticket The ticket with updated data
+     * @return The ticket with updated data
      */
 
     @Nullable
@@ -273,9 +275,11 @@ public class TicketsDatabaseHelper {
 
         String channelID;
 
-        try {
+        try (
             Connection connection = getDatabaseConnection();
-            PreparedStatement ps = connection.prepareStatement("SELECT channel FROM tickets WHERE discordid = '" + discordID + "' ORDER BY id DESC");
+            PreparedStatement ps = connection.prepareStatement("SELECT channel FROM tickets WHERE discordid = ? ORDER BY id DESC")) {
+            ps.setString(1, discordID);
+
             ResultSet rs = ps.executeQuery();
 
             if (!rs.next()) {
@@ -285,8 +289,6 @@ public class TicketsDatabaseHelper {
             }
 
             rs.close();
-            ps.close();
-            connection.close();
 
         } catch (SQLException exception) {
             exception.printStackTrace();
@@ -298,23 +300,21 @@ public class TicketsDatabaseHelper {
     }
 
     public void addConfirmationMessage(int ticketId, String confirmationMessageId, String reason) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
-
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("INSERT INTO closes (ticketid, confirmationid, reason) VALUES (?, ?, ?)");
+            PreparedStatement statement = con.prepareStatement("INSERT INTO closes (ticketid, confirmationid, reason) VALUES (?, ?, ?)")) {
             statement.setInt(1, ticketId);
             statement.setString(2, confirmationMessageId);
             statement.setString(3, reason);
 
+            statement.executeUpdate();
             // Execute Query & Clean Up
-            if (!statement.execute()) {
+            /*if (!statement.execute()) {
                 // TODO Something went wrong
-            }
+            }*/
 
-            statement.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -322,23 +322,23 @@ public class TicketsDatabaseHelper {
     }
 
     public void addConfirmationMessage(int ticketId, String confirmationMessageId, String reason, String closeTime) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
-
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("INSERT INTO closes (ticketid, confirmationid, reason, closetime) VALUES (?, ?, ?, ?)");
+            PreparedStatement statement = con.prepareStatement("INSERT INTO closes (ticketid, confirmationid, reason, closetime) VALUES (?, ?, ?, ?)")) {
+
             statement.setInt(1, ticketId);
             statement.setString(2, confirmationMessageId);
             statement.setString(3, reason);
             statement.setString(4, closeTime);
 
+            statement.execute();
+            /*
             // Execute Query & Clean Up
             if (!statement.execute()) {
                 // TODO Something went wrong
-            }
-            statement.close();
-            con.close();
+            }*/
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -347,12 +347,12 @@ public class TicketsDatabaseHelper {
 
     public HashMap<Integer, String> getAllTimedCloses() {
         HashMap<Integer, String> timedCloses = new HashMap<>();
-        try {
+        try (
             //Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE closetime IS NOT NULL");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE closetime IS NOT NULL")) {
 
             // Fetch Results
             ResultSet results = statement.executeQuery();
@@ -363,8 +363,6 @@ public class TicketsDatabaseHelper {
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -374,20 +372,19 @@ public class TicketsDatabaseHelper {
     }
 
     public void removeConfirmationMessage(String confirmationMessageId) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
-
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE confirmationid=?");
+            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE confirmationid=?")) {
             statement.setString(1, confirmationMessageId);
 
+            statement.executeUpdate();
+            /*
             // Execute Query & Clean Up
             if (!statement.execute()) {
                 // TODO Something went wrong
-            }
-            statement.close();
-            con.close();
+            }*/
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -395,27 +392,29 @@ public class TicketsDatabaseHelper {
     }
 
     public void removeAllConfirmationMessages(int ticketId) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE ticketid=?");
+            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE ticketid=?")) {
+
             statement.setInt(1, ticketId);
 
+            statement.executeUpdate();
+            /*
             // Execute Query & Clean Up
             if (!statement.execute()) {
                 // TODO Something went wrong
-            }
-            statement.close();
-            con.close();
+            }*/
+
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
         }
     }
 
-    public void removeAllConfirmationMessages(String confirmationMessageId) {
+    /*public void removeAllConfirmationMessages(String confirmationMessageId) {
         try {
             // Establish Database Connection
             Connection con = getDatabaseConnection();
@@ -438,25 +437,25 @@ public class TicketsDatabaseHelper {
             e.printStackTrace();
             DirtBot.pokeTech(e);
         }
-    }
+    }*/
 
     public boolean isConfirmationMessage(String confirmationMessageId) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid=?");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid = ?")) {
             statement.setString(1, confirmationMessageId);
 
             // Execute Query
             ResultSet results = statement.executeQuery();
-            if (results.next()) return true;
+            boolean result = results.next();
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
+
+            return result;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
@@ -465,12 +464,13 @@ public class TicketsDatabaseHelper {
     }
 
     public String getClosureReason(String confirmationMessageId) {
-        try {
+        try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid=?");
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid=?")) {
+
             statement.setString(1, confirmationMessageId);
 
             // Execute Query
@@ -480,8 +480,6 @@ public class TicketsDatabaseHelper {
 
             // Clean Up
             results.close();
-            statement.close();
-            con.close();
 
             return reason;
         } catch (SQLException e) {
@@ -491,6 +489,7 @@ public class TicketsDatabaseHelper {
         return "No reason found.";
     }
 
+    /*
     public int getLastAutoIncrementID() {
         try {
             // Establish Database Connection
@@ -517,5 +516,5 @@ public class TicketsDatabaseHelper {
             DirtBot.pokeTech(e);
         }
         return 0;
-    }
+    }*/
 }
