@@ -113,10 +113,11 @@ public class TicketUtils {
     }
 
     public boolean isTicketChannel(TextChannel channel) {
-        if(channel.getParent().getId().equals(module.getConfig().supportCategoryID)) return true;
-        if(channel.getParent().getId().equals(module.getConfig().ownerSupportCategoryID)) return true;
-        for(List<String> serverInfo : DirtBot.getConfig().servers) {
-            if(serverInfo.get(2).equals(channel.getParent().getId())) return true;
+        if (channel.getParent() == null) return false;
+        if (channel.getParent().getId().equals(module.getConfig().supportCategoryID)) return true;
+        if (channel.getParent().getId().equals(module.getConfig().ownerSupportCategoryID)) return true;
+        for (List<String> serverInfo : DirtBot.getConfig().servers) {
+            if (serverInfo.get(2).equals(channel.getParent().getId())) return true;
         }
         return false;
     }
