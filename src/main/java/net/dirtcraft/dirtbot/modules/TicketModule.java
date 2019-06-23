@@ -331,6 +331,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                 new Thread(() -> {
                     try {
                         for(Message message : Lists.reverse(messageHistory)) {
+                            if (message.getMember().getEffectiveName() == null) continue;
                             String line = "";
                             line += message.getMember().getEffectiveName();
                             line += " : ";

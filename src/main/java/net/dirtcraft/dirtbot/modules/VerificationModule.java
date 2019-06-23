@@ -100,7 +100,7 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
 
         EmbedBuilder verify = verificationCode != null ?
                 getEmbedUtils().getEmptyEmbed().setDescription("Please enter **/verify " + verificationCode + "** in-game to verify your account") :
-                getEmbedUtils().getErrorEmbed("Your account is already verified!");
+                getEmbedUtils().getErrorEmbed("Your account is already verified with **" + database.getUsernamefromUUID(database.getUUIDfromDiscordID(discordID)) + "**!");
 
         event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(verify.build()).queue());
 

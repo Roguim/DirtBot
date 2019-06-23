@@ -65,6 +65,10 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
         Member ten = server.getMemberById("155688380162637825");
         Member julian = server.getMemberById("209865813849538560");
 
+        if (event.getMember().getUser().isFake() || event.getMember().getUser().isBot()) return;
+        if (DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID) == null) return;
+        if (event.getMember() == null) return;
+        if (event.getMember().getRoles() == null) return;
         if (!event.getMessage().getAuthor().isBot() && !event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
             if (event.getMessage().getMentionedMembers().contains(ten)) {
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! <@155688380162637825> doesn't like to be pinged.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue(m -> m.delete().queueAfter(10, TimeUnit.SECONDS));

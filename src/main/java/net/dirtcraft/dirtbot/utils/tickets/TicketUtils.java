@@ -113,6 +113,7 @@ public class TicketUtils {
     }
 
     public boolean isTicketChannel(TextChannel channel) {
+        if (channel == null) return false;
         if (channel.getParent() == null) return false;
         if (channel.getParent().getId().equals(module.getConfig().supportCategoryID)) return true;
         if (channel.getParent().getId().equals(module.getConfig().ownerSupportCategoryID)) return true;

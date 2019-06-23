@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @CommandClass(TicketModule.class)
 public class CloseTicket extends CommandTicket {
@@ -39,8 +40,8 @@ public class CloseTicket extends CommandTicket {
             })
         );
 
-        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queue();
-        event.getTextChannel().getManager().setTopic("This ticket has now been **completed** and pending a review").queue();
+        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queueAfter(1, TimeUnit.SECONDS);
+        event.getTextChannel().getManager().setTopic("This ticket has now been **completed** and pending a review").queueAfter(1, TimeUnit.SECONDS);
         return true;
     }
 

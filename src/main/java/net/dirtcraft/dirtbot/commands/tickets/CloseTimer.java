@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @CommandClass(TicketModule.class)
 public class CloseTimer extends CommandTicketStaff {
@@ -25,7 +26,7 @@ public class CloseTimer extends CommandTicketStaff {
         String reason = String.join(" ", args);
 
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
-                .addField("__Ticket Close Timer Set__", "This ticket will be automatically closed in **24 hours.**\n" +
+                .addField("__Ticket Close Timer Set__", "This ticket will be automatically closed in **24 hours**\n" +
                         "To **close now**, please select \u2705" + "\n" +
                         "To **cancel closure**, please select \u274C", false)
                 .addField("__Reason__", reason, false);
@@ -40,8 +41,8 @@ public class CloseTimer extends CommandTicketStaff {
                 })
         );
 
-        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queue();
-        event.getTextChannel().getManager().setTopic("This ticket has now pending a review").queue();
+        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queueAfter(1, TimeUnit.SECONDS);
+        event.getTextChannel().getManager().setTopic("This ticket has now pending a review").queueAfter(1, TimeUnit.SECONDS);
 
         return true;
     }
