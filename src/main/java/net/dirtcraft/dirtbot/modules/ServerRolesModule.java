@@ -73,6 +73,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
                 case "skyodyssey":
                 case "direwolf20":
                 case "omnifactory":
+                case "pixelmon":
                     giveRole(event);
                     break;
             }
@@ -95,6 +96,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
                 case "skyodyssey":
                 case "direwolf20":
                 case "omnifactory":
+                case "pixelmon":
                     removeRole(event);
                     break;
             }
@@ -108,8 +110,12 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.GREEN)
                 .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
-                .setDescription("You are now subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**")
                 .setTimestamp(Instant.now());
+        if (!event.getReactionEmote().getName().equalsIgnoreCase("pixelmon")) {
+            embed.setDescription("You are now subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**");
+        } else {
+            embed.setDescription("You are now subscribed to updates regarding **Pixelmon Reforged**");
+        }
         event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 
@@ -120,8 +126,12 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.RED)
                 .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
-                .setDescription("You are no longer subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**")
                 .setTimestamp(Instant.now());
+        if (!event.getReactionEmote().getName().toLowerCase().equalsIgnoreCase("pixelmon")) {
+                embed.setDescription("You are no longer subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**");
+        } else {
+            embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
+        }
         event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }

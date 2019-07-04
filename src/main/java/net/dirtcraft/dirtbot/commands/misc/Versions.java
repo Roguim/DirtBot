@@ -31,12 +31,17 @@ public class Versions implements ICommand {
             names.add(server.get(0));
             versions.add(server.get(4));
         }
+
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
                 .addField("__ModPacks__", String.join("\n", names), true)
                 .addField("__Versions__", String.join("\n", versions), true)
                 .build();
         event.getTextChannel().sendMessage(response).queue();
         return true;
+    }
+
+    private int sortType(String server) {
+        return server.toLowerCase().contains("pixel") ? 0 : 1;
     }
 
     @Override

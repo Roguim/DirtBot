@@ -26,6 +26,7 @@ public class Vote implements ICommand {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
                 .setTimestamp(null)
                 .addField("__Voting Links__", "[**Click me to vote on Minecraft-MP**](https://minecraft-mp.com/server/206809/vote/)\n" +
+                                "[**Click me to vote on Pixelmon Servers**](https://pixelmonservers.com/server/75qpnFWv/vote)\n" +
                                 "[**Click me to vote on FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/vote)",
                         false)
                 .setFooter("Offline votes will be credited to your account upon login", null)

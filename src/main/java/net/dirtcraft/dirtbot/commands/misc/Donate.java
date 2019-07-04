@@ -26,7 +26,8 @@ public class Donate implements ICommand {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
                 .setTimestamp(null)
                 .setFooter(null, null)
-                .addField("__DirtCraft Support Shop__", "[**Click me to open the DirtStore**](https://store.dirtcraft.net)",
+                .addField("__DirtCraft Support Shop__", "[Click me to open the **Pixelmon DirtStore**](https://store.pixelmon.gg/)\n" +
+                                "[Click me to open the **Feed The Beast DirtStore**](https://store.dirtcraft.net/)",
                         false).build();
         event.getTextChannel().sendMessage(response).queue();
         return true;

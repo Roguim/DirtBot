@@ -371,6 +371,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     private void printChannelHeader() {
         EmbedBuilder instructions = getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
                 .addField("__Ticket System Instructions__",
                         "**1.** Briefly describe the issue you're having **inside of this channel**. Make sure to include your username and server." + "\n" +
                                 "**2.** Proceed to your linked ticket. Our staff team will assist you shortly.\n" +
@@ -443,9 +444,11 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             return;
         }
 
+        String uuid = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
+        String username = getVerificationDB().getUsernamefromUUID(uuid);
+
         TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "),
-                event.getMember(),
-                getVerificationDB().getUsernamefromUUID(getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId())));
+                event.getMember(), username != null ? username : "N/A");
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
         event.getChannel().sendMessage(response.build()).queue((message) -> {

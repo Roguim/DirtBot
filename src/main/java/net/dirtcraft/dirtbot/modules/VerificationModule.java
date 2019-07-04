@@ -98,9 +98,12 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
 
         if (!database.hasRecord(discordID)) database.createRecord(discordID, verificationCode);
 
+        String uuid = database.getUUIDfromDiscordID(discordID);
+        String username = database.getUsernamefromUUID(uuid);
+
         EmbedBuilder verify = verificationCode != null ?
                 getEmbedUtils().getEmptyEmbed().setDescription("Please enter **/verify " + verificationCode + "** in-game to verify your account") :
-                getEmbedUtils().getErrorEmbed("Your account is already verified with **" + database.getUsernamefromUUID(database.getUUIDfromDiscordID(discordID)) + "**!");
+                getEmbedUtils().getErrorEmbed("Your account is already verified" + (username != null ? " with **" + username + "**!" : "!"));
 
         event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(verify.build()).queue());
 

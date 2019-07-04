@@ -65,6 +65,7 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
         Member ten = server.getMemberById("155688380162637825");
         Member julian = server.getMemberById("209865813849538560");
 
+        if (event.getMember() == null) return;
         if (event.getMember().getUser().isFake() || event.getMember().getUser().isBot()) return;
         if (DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID) == null) return;
         if (event.getMember() == null) return;
