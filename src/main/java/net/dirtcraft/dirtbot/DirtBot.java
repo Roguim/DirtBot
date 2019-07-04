@@ -109,5 +109,27 @@ public class DirtBot {
                 }
             });
         });
+        pokeShiny(e);
+    }
+
+    private static void pokeShiny(Exception e) {
+        DirtBot.getJda().getUserById("248056002274918400").openPrivateChannel().queue((privateChannel) -> {
+            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+            List<String> messageExceptions = new ArrayList<>();
+            String workingException = "";
+            for(String string : exception) {
+                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
+                else {
+                    messageExceptions.add(workingException);
+                    workingException = string;
+                }
+            }
+            if(!workingException.equals("")) messageExceptions.add(workingException);
+            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
+                for(String string : messageExceptions) {
+                    privateChannel.sendMessage("```" + string + "```").queue();
+                }
+            });
+        });
     }
 }
