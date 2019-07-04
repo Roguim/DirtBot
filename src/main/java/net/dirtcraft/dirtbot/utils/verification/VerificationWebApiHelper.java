@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VerificationWebApiHelper {
-    public static String getLastUsername(String uuid) {
+    public static String getCurrentUsername(String uuid) {
         uuid = uuid.replace("-","");
         String currentName = null;
         HttpURLConnection con = null;
