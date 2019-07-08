@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +29,8 @@ public class CloseTicket extends CommandTicket {
         String reason = EmojiParser.parseToAliases(String.join(" ", args), EmojiParser.FitzpatrickAction.REMOVE);
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
                 .addField("__Close Ticket__", "Are you sure you want to close this ticket?\n" +
-                        "\nPlease confirm or cancel this command by selecting one of the options below.", false)
-                .addField("__Reason__", reason, false);
+                        "Please confirm or cancel this command by selecting one of the options below.", false)
+                .addField("__Reason__", "```" + WordUtils.capitalizeFully(reason) + "```", false);
 
         MessageEmbed reviewEmbed = getModule().getEmbedUtils().getReviewEmbed();
 
