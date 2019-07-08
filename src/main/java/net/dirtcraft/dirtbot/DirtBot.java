@@ -70,68 +70,32 @@ public class DirtBot {
 
     public static ModuleRegistry getModuleRegistry() { return moduleRegistry; }
 
+    private static ArrayList<String> exceptionNotifications = new ArrayList<String>() {{
+        add("177618988761743360");
+        add("209865813849538560");
+        add("248056002274918400");
+    }};
+
     public static void pokeTech(Exception e) {
-        DirtBot.getJda().getUserById("177618988761743360").openPrivateChannel().queue((privateChannel) -> {
-            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
-            List<String> messageExceptions = new ArrayList<>();
-            String workingException = "";
-            for(String string : exception) {
-                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
-                else {
-                    messageExceptions.add(workingException);
-                    workingException = string;
+        for (String notification : exceptionNotifications) {
+            DirtBot.getJda().getUserById(notification).openPrivateChannel().queue((privateChannel) -> {
+                String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+                List<String> messageExceptions = new ArrayList<>();
+                String workingException = "";
+                for(String string : exception) {
+                    if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
+                    else {
+                        messageExceptions.add(workingException);
+                        workingException = string;
+                    }
                 }
-            }
-            if(!workingException.equals("")) messageExceptions.add(workingException);
-            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
-                for(String string : messageExceptions) {
-                    privateChannel.sendMessage("```" + string + "```").queue();
-                }
+                if(!workingException.equals("")) messageExceptions.add(workingException);
+                privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
+                    for(String string : messageExceptions) {
+                        privateChannel.sendMessage("```" + string + "```").queue();
+                    }
+                });
             });
-        });
-        pokeJulian(e);
-    }
-
-    private static void pokeJulian(Exception e) {
-        DirtBot.getJda().getUserById("209865813849538560").openPrivateChannel().queue((privateChannel) -> {
-            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
-            List<String> messageExceptions = new ArrayList<>();
-            String workingException = "";
-            for(String string : exception) {
-                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
-                else {
-                    messageExceptions.add(workingException);
-                    workingException = string;
-                }
-            }
-            if(!workingException.equals("")) messageExceptions.add(workingException);
-            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
-                for(String string : messageExceptions) {
-                    privateChannel.sendMessage("```" + string + "```").queue();
-                }
-            });
-        });
-        pokeShiny(e);
-    }
-
-    private static void pokeShiny(Exception e) {
-        DirtBot.getJda().getUserById("248056002274918400").openPrivateChannel().queue((privateChannel) -> {
-            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
-            List<String> messageExceptions = new ArrayList<>();
-            String workingException = "";
-            for(String string : exception) {
-                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
-                else {
-                    messageExceptions.add(workingException);
-                    workingException = string;
-                }
-            }
-            if(!workingException.equals("")) messageExceptions.add(workingException);
-            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
-                for(String string : messageExceptions) {
-                    privateChannel.sendMessage("```" + string + "```").queue();
-                }
-            });
-        });
+        }
     }
 }
