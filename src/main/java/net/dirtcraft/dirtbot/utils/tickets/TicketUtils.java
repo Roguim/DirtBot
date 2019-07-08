@@ -6,7 +6,9 @@ import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
+import org.apache.commons.lang3.text.WordUtils;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -64,6 +66,25 @@ public class TicketUtils {
         return ticketChannel;
     }
 
+    @Nullable
+    public TextChannel createTicket(Ticket ticket, String discordID) {
+        Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
+        Member member = server.getMemberById(discordID);
+        if (member == null) return null;
+        TextChannel ticketChannel = (TextChannel) server.getController().createTextChannel(Integer.toString(ticket.getId()))
+                .setParent(server.getCategoryById(module.getConfig().supportCategoryID))
+                .addPermissionOverride(member, EnumSet.of(Permission.MESSAGE_READ), null)
+                .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
+                .addPermissionOverride(server.getRoleById(server.getId()), null, EnumSet.of(Permission.MESSAGE_READ))
+                .setTopic("**Awaiting <@&" + DirtBot.getConfig().staffRoleID + ">'s Response...**")
+                .complete();
+        ticket.setChannel(ticketChannel.getId());
+        module.getDatabaseHelper().modifyTicket(ticket);
+        ticketChannel.sendMessage(module.getEmbedUtils().getTicketHeader(ticket)).queue((message) -> message.pin().queue());
+        module.getEmbedUtils().sendLog("Created", ticket.getMessage(), ticket, member);
+        return ticketChannel;
+    }
+
     public Ticket setTicketLevel(Ticket ticket, Ticket.Level level) {
         // Make sure the ticket has a channel in the first place
         if (ticket.getChannel() == null) return ticket;
@@ -92,8 +113,8 @@ public class TicketUtils {
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
         if(review) {
             EmbedBuilder reviewDM = module.getEmbedUtils().getEmptyEmbed()
-                    .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
-                            "```" + message + "```", false);
+                    .addField("__Ticket Closed__", "Your ticket **#" + ticket.getId() + "** has been closed for the following reason:\n" +
+                            "```" + WordUtils.capitalizeFully(message) + "```", false);
             for(Member member : getTicketMembers(ticket)) {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
             }

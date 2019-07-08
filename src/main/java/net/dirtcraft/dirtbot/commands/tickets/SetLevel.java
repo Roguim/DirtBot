@@ -7,6 +7,7 @@ import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageReaction;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -53,13 +54,15 @@ public class SetLevel extends CommandTicketStaff {
                             String pingMessage = "";
                             boolean hasUser = false;
                             for(User user : users) {
-                                if(!user.isBot() && DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMember(user).getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().adminRoleID))) {
+                                Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMember(user);
+                                if (member == null) continue;
+                                if (!member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) continue;
+                                if(!user.isBot() && member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().adminRoleID))) {
                                     pingMessage += "<@" + user.getId() + ">, ";
                                     hasUser = true;
                                 }
                             }
                             if(hasUser) {
-
                                 event.getTextChannel().sendMessage(pingMessage.substring(0, pingMessage.length() - 2)).queue();
                             }
                         });
