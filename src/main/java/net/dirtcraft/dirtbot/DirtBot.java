@@ -3,6 +3,7 @@ package net.dirtcraft.dirtbot;
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
 import net.dirtcraft.dirtbot.modules.VerificationModule;
+import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -26,7 +27,8 @@ public class DirtBot {
         coreModule.initializeConfiguration();
 
         //Initialize Discord Bot
-        jda = new JDABuilder(getConfig().botToken)
+        jda = new JDABuilder(AccountType.BOT)
+                .setToken(getConfig().botToken)
                 .build()
                 .awaitReady();
         jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "Booting Up...", "https://www.twitch.tv/dirtcraft/"));

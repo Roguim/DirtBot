@@ -1,5 +1,6 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import com.vdurmont.emoji.EmojiParser;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicket;
@@ -24,7 +25,7 @@ public class CloseTicket extends CommandTicket {
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        String reason = String.join(" ", args);
+        String reason = EmojiParser.parseToAliases(String.join(" ", args), EmojiParser.FitzpatrickAction.REMOVE);
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
                 .addField("__Close Ticket__", "Are you sure you want to close this ticket?\n" +
                         "\nPlease confirm or cancel this command by selecting one of the options below.", false)

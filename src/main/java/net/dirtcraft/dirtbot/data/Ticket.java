@@ -30,19 +30,16 @@ public class Ticket {
     public boolean getOpen() { return open; }
     public String getMessage() { return message; }
     public String getUsername(boolean nullable) {
-        if(!nullable && username == null) return "";
-        else return username;
+        return nullable ? username : (username != null ? username : "");
     }
     public String getServer(boolean nullable) {
-        if(!nullable && server == null) return "";
-        else return server;
+        return nullable ? server : (server != null ? server : "");
     }
     public String getChannel() { return channel; }
     public Level getLevel() { return level; }
 
     public String getDiscordID(boolean nullable) {
-        if(!nullable && discordid == null) return "";
-        else return discordid;
+        return nullable ? discordid : (discordid != null ? discordid : "");
     }
 
     public void setId(int id) {this.id = id;}

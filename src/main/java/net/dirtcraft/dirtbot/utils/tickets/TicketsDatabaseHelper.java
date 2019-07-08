@@ -192,7 +192,6 @@ public class TicketsDatabaseHelper {
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeTech(e);
-            tickets = null;
         }
         return tickets;
     }
