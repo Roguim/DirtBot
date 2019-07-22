@@ -337,6 +337,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                 new Thread(() -> {
                     try {
                         for(Message message : Lists.reverse(messageHistory)) {
+                            if (message == null) continue;
+                            if (message.getMember() == null) continue;
                             if (message.getMember().getEffectiveName() == null) continue;
                             String line = "";
                             line += message.getMember().getEffectiveName();
@@ -359,7 +361,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                         file.toFile().delete();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        DirtBot.pokeTech(e);
+                        DirtBot.pokeDevs(e);
                     }
                 }).start());
     }
@@ -370,7 +372,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             return new ZipFile("archives" + File.separator + "tickets" + File.separator + "Tickets-" + (ticketID - diff) + "-" + (ticketID - diff + 99) + ".zip");
         } catch (Exception e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return null;
     }

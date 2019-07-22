@@ -1,9 +1,7 @@
 package net.dirtcraft.dirtbot.internal.modules;
 
 import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.modules.AppealModule;
 import net.dirtcraft.dirtbot.modules.CoreModule;
-import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.JDA;
 import org.reflections.Reflections;
 
@@ -27,7 +25,7 @@ public class ModuleRegistry {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 

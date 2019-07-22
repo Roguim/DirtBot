@@ -2,6 +2,7 @@ package net.dirtcraft.dirtbot;
 
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
+import net.dirtcraft.dirtbot.modules.MiscModule;
 import net.dirtcraft.dirtbot.modules.VerificationModule;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -49,11 +50,13 @@ public class DirtBot {
         jda.addEventListener(coreModule);
         moduleRegistry.registerEventListeners(jda);
 
-        // Update verification channel message
-        moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
-
         // Core Module Post-Init
         coreModule.postInitialize();
+
+        // Update verification channel message
+        moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
+        // Initialize player count scheduler
+        moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
 
         System.out.println("DirtBot is now initialized");
         jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
@@ -76,7 +79,7 @@ public class DirtBot {
         add("248056002274918400");
     }};
 
-    public static void pokeTech(Exception e) {
+    public static void pokeDevs(Exception e) {
         for (String notification : exceptionNotifications) {
             DirtBot.getJda().getUserById(notification).openPrivateChannel().queue((privateChannel) -> {
                 String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");

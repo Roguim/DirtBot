@@ -29,7 +29,7 @@ public class VerificationDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
         }
     }
 
@@ -48,7 +48,7 @@ public class VerificationDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
             return false;
         }
     }
@@ -71,7 +71,7 @@ public class VerificationDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
             return null;
         }
     }
@@ -94,7 +94,7 @@ public class VerificationDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
             return false;
         }
     }

@@ -27,6 +27,7 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
         // Register Commands
         DirtBot.getCoreModule().registerCommands(
                 new Donate(this),
+                new Launcher(this),
                 new Maps(this),
                 //new NotMyDepartment(this), Vetoed by Julian ):
                 new Ping(this),

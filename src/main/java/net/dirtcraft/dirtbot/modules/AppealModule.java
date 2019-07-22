@@ -225,7 +225,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     file.toFile().delete();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    DirtBot.pokeTech(e);
+                    DirtBot.pokeDevs(e);
                 }
             }).start();
     }

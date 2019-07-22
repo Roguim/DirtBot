@@ -57,11 +57,11 @@ public class TicketsDatabaseHelper {
             
             } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return null;
     }
@@ -105,7 +105,7 @@ public class TicketsDatabaseHelper {
             return ticket;
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return null;
     }
@@ -148,7 +148,7 @@ public class TicketsDatabaseHelper {
             results.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
             ticket = null;
         }
         return ticket;
@@ -191,7 +191,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return tickets;
     }
@@ -224,7 +224,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
             hasOpenTicket = false;
         }
 
@@ -261,7 +261,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 
@@ -293,7 +293,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            DirtBot.pokeTech(exception);
+            DirtBot.pokeDevs(exception);
             channelID = null;
         }
 
@@ -318,7 +318,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 
@@ -342,7 +342,7 @@ public class TicketsDatabaseHelper {
             }*/
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 
@@ -366,7 +366,7 @@ public class TicketsDatabaseHelper {
             results.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
             timedCloses = null;
         }
         return timedCloses;
@@ -388,7 +388,7 @@ public class TicketsDatabaseHelper {
             }*/
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 
@@ -411,7 +411,7 @@ public class TicketsDatabaseHelper {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }
 
@@ -436,7 +436,7 @@ public class TicketsDatabaseHelper {
             con.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
     }*/
 
@@ -459,7 +459,7 @@ public class TicketsDatabaseHelper {
             return result;
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return false;
     }
@@ -485,7 +485,7 @@ public class TicketsDatabaseHelper {
             return reason;
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return "No reason found.";
     }
@@ -514,7 +514,7 @@ public class TicketsDatabaseHelper {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return 0;
     }*/

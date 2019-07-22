@@ -25,7 +25,7 @@ public class VerificationWebApiHelper {
             con = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
             if (con != null) con.disconnect();
             return null;
         }
@@ -48,7 +48,7 @@ public class VerificationWebApiHelper {
 
         } catch (IOException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         } finally {
             con.disconnect();
         }
@@ -65,7 +65,7 @@ public class VerificationWebApiHelper {
             con = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
             if (con != null) con.disconnect();
             return null;
         }
@@ -88,7 +88,7 @@ public class VerificationWebApiHelper {
 
         } catch (IOException e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         } finally {
             con.disconnect();
         }

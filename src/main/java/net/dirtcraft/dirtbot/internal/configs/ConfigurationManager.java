@@ -47,7 +47,7 @@ public class ConfigurationManager<T extends IConfigData> {
                 return clazz.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
-                DirtBot.pokeTech(e);
+                DirtBot.pokeDevs(e);
             }
             return null;
         };
