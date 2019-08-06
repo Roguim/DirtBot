@@ -70,6 +70,21 @@ public class SetLevel extends CommandTicketStaff {
                 }
             });
         }
+        //Add server code to Owner channels	
+        if(level == Ticket.Level.OWNER && ticket.getServer(true) != null) {	
+        	String ticketName = event.getChannel().getName();	
+        	String server = ticket.getServer(true);	
+        	String ticketId = String.valueOf(ticket.getId());
+    		if(ticketName.contains(server)) {
+    			ticketName = ticketName.replaceAll("-" + server, "");
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		} else {
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		}
+    		event.getTextChannel().getManager().setName(ticketName).queue();
+        }
         return true;
     }
 
