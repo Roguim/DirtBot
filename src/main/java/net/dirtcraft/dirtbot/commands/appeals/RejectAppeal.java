@@ -22,7 +22,7 @@ public class RejectAppeal extends CommandAppealStaff {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         String message = String.join(" ", args);
-        MessageEmbed responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
+        MessageEmbed responseEmbed = getModule().getEmbedUtils().getExternalEmbed()
                 .addField("__Appeal Rejected__", "Your appeal has been rejected by <@" + event.getMember().getUser().getId() + "> with the following message:\n + '''" + message + "'''", false)
                 .build();
         event.getTextChannel().getIterableHistory().queue((iterableHistory) -> {

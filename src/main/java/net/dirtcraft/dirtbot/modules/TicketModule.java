@@ -238,6 +238,10 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                     .setTimestamp(Instant.now());
         }
 
+        public EmbedBuilder getExternalEmbed() {
+            return getEmptyEmbed().setTitle(getConfig().embedTitle.replace(":redbulletpoint:", "\ud83e\udd16"));
+        }
+
         public void sendLog(String eventName, String eventInfo, Ticket ticket, Member member) {
             sendLog(getEmptyEmbed()
                     .addField("__Ticket Event | " + eventName + "__", eventInfo, false)
@@ -487,7 +491,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     private void notificationSubscribed(GuildMessageReactionAddEvent event, Message message) {
         if(message.getEmbeds().size() > 0 && message.getEmbeds().get(0).getFields().size() > 0) {
             String server = message.getEmbeds().get(0).getFields().get(0).getName().substring(12, message.getEmbeds().get(0).getFields().get(0).getName().length() - 18);
-            EmbedBuilder subscriptionNotification = getEmbedUtils().getEmptyEmbed().addField("__Subscribed__", "You have successfully subscribed to notifications for **" + server + "** tickets!", false);
+            EmbedBuilder subscriptionNotification = getEmbedUtils().getExternalEmbed().addField("__Subscribed__", "You have successfully subscribed to notifications for **" + server + "** tickets!", false);
             event.getUser().openPrivateChannel().queue((privateChannel) -> privateChannel.sendMessage(subscriptionNotification.build()).queue());
         }
     }
@@ -495,7 +499,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     private void notificationUnsubscribed(GuildMessageReactionRemoveEvent event, Message message) {
         if(message.getEmbeds().size() > 0 && message.getEmbeds().get(0).getFields().size() > 0) {
             String server = message.getEmbeds().get(0).getFields().get(0).getName().substring(12, message.getEmbeds().get(0).getFields().get(0).getName().length() - 18);
-            EmbedBuilder unsubscriptionNotification = getEmbedUtils().getEmptyEmbed().addField("__Unubscribed__", "You have successfully unsubscribed to notifications for **" + server + "** tickets!", false);
+            EmbedBuilder unsubscriptionNotification = getEmbedUtils().getExternalEmbed().addField("__Unubscribed__", "You have successfully unsubscribed to notifications for **" + server + "** tickets!", false);
             event.getUser().openPrivateChannel().queue((privateChannel) -> privateChannel.sendMessage(unsubscriptionNotification.build()).queue());
         }
     }

@@ -22,7 +22,7 @@ public class AcceptAppeal extends CommandAppealStaff {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         String message = String.join(" ", args);
-        MessageEmbed responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
+        MessageEmbed responseEmbed = getModule().getEmbedUtils().getExternalEmbed()
                 .addField("__Appeal Accepted", "Your appeal has been accepted by <@" + event.getMember().getUser().getId() + "> with the following message:\n + '''" + message + "'''", false)
                 .build();
         event.getTextChannel().getIterableHistory().queue((iterableHistory) -> {

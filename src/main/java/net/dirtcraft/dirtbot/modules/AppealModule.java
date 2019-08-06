@@ -79,7 +79,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                         if(ChronoUnit.HOURS.between(appealCreatedTime, now) >= 24) {
                             for(Member member : getAppealUtils().getAppealMembers(DirtBot.getJda().getTextChannelById(appeal.getChannelID()))) {
                                 member.getUser().openPrivateChannel().queue((privateChannel) -> {
-                                    EmbedBuilder dmEmbed = getEmbedUtils().getEmptyEmbed()
+                                    EmbedBuilder dmEmbed = getEmbedUtils().getExternalEmbed()
                                             .addField("__Appeal Cancelled__", "Your appeal information was not filled out within 24 hours and was therefore deemed abandoned. Please submit a new appeal.", false);
                                     privateChannel.sendMessage(dmEmbed.build()).queue();
                                 });
@@ -176,6 +176,10 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     .setTimestamp(Instant.now());
         }
 
+        public EmbedBuilder getExternalEmbed() {
+            return getEmptyEmbed().setTitle(getConfig().embedTitle.replace(":redbulletpoint:", "\ud83e\udd16"));
+        }
+
         public void sendLog(String eventName, String eventInfo, Appeal appeal, Member member) {
             sendLog(eventName, eventInfo, DirtBot.getJda().getTextChannelById(appeal.getChannelID()), member);
         }
@@ -260,7 +264,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
                 for(Member member : getAppealUtils().getAppealMembers(channel)) {
                     member.getUser().openPrivateChannel().queue((privateChannel) -> {
-                        EmbedBuilder dmEmbed = getEmbedUtils().getEmptyEmbed()
+                        EmbedBuilder dmEmbed = getEmbedUtils().getExternalEmbed()
                                 .addField("__Appeal Cancelled__", "Your appeal information was not filled out and the bot has since restarted. Please submit a new appeal.", false);
                         privateChannel.sendMessage(dmEmbed.build()).queue();
                     });

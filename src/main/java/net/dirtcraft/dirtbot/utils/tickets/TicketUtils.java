@@ -91,7 +91,7 @@ public class TicketUtils {
         module.getDatabaseHelper().removeAllConfirmationMessages(ticket.getId());
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
         if(review) {
-            EmbedBuilder reviewDM = module.getEmbedUtils().getEmptyEmbed()
+            EmbedBuilder reviewDM = module.getEmbedUtils().getExternalEmbed()
                     .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
                             "```" + message + "```", false);
             for(Member member : getTicketMembers(ticket)) {
