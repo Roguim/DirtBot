@@ -2,6 +2,9 @@ package net.dirtcraft.dirtbot;
 
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
+import net.dirtcraft.dirtbot.modules.MiscModule;
+import net.dirtcraft.dirtbot.modules.VerificationModule;
+import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Game;
@@ -25,7 +28,8 @@ public class DirtBot {
         coreModule.initializeConfiguration();
 
         //Initialize Discord Bot
-        jda = new JDABuilder(getConfig().botToken)
+        jda = new JDABuilder(AccountType.BOT)
+                .setToken(getConfig().botToken)
                 .build()
                 .awaitReady();
         jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "Booting Up...", "https://www.twitch.tv/dirtcraft/"));
@@ -49,8 +53,13 @@ public class DirtBot {
         // Core Module Post-Init
         coreModule.postInitialize();
 
+        // Update verification channel message
+        moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
+        // Initialize player count scheduler
+        moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
+
         System.out.println("DirtBot is now initialized");
-        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DirtCord", "https://www.twitch.tv/dirtcraft/"));
+        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
 
     }
 
@@ -64,24 +73,32 @@ public class DirtBot {
 
     public static ModuleRegistry getModuleRegistry() { return moduleRegistry; }
 
-    public static void pokeTech(Exception e) {
-        DirtBot.getJda().getUserById("177618988761743360").openPrivateChannel().queue((privateChannel) -> {
-            String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
-            List<String> messageExceptions = new ArrayList<>();
-            String workingException = "";
-            for(String string : exception) {
-                if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
-                else {
-                    messageExceptions.add(workingException);
-                    workingException = string;
+    private static ArrayList<String> exceptionNotifications = new ArrayList<String>() {{
+        add("177618988761743360");
+        add("209865813849538560");
+        add("248056002274918400");
+    }};
+
+    public static void pokeDevs(Exception e) {
+        for (String notification : exceptionNotifications) {
+            DirtBot.getJda().getUserById(notification).openPrivateChannel().queue((privateChannel) -> {
+                String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
+                List<String> messageExceptions = new ArrayList<>();
+                String workingException = "";
+                for(String string : exception) {
+                    if(workingException.length() + string.length() <= 1900) workingException += "\n" + string;
+                    else {
+                        messageExceptions.add(workingException);
+                        workingException = string;
+                    }
                 }
-            }
-            if(!workingException.equals("")) messageExceptions.add(workingException);
-            privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
-                for(String string : messageExceptions) {
-                    privateChannel.sendMessage("```" + string + "```").queue();
-                }
+                if(!workingException.equals("")) messageExceptions.add(workingException);
+                privateChannel.sendMessage("**NEW ERROR**").queue((message) -> {
+                    for(String string : messageExceptions) {
+                        privateChannel.sendMessage("```" + string + "```").queue();
+                    }
+                });
             });
-        });
+        }
     }
 }

@@ -58,7 +58,7 @@ public class CommandRegistry {
                     if(!command.execute(event, args)) {
                         // TODO: ICommand Failed to Execute Error Embed// The command executed successfully, delete the message the player sent
                     } else {
-                        event.getMessage().delete().queue();
+                        if (!event.getChannel().getId().equals(DirtBot.getConfig().botspamChannelID)) event.getMessage().delete().queue();
                     }
                 }
                 return true;

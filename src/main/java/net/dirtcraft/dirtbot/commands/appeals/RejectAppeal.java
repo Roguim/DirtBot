@@ -32,7 +32,7 @@ public class RejectAppeal extends CommandAppealStaff {
                 appealerName = member.getEffectiveName();
             }
             getModule().archiveAppeal(iterableHistory, appealerName);
-            getModule().getEmbedUtils().sendLog("Rejected", "An appeal has been rejected with the following message:\n\n" + message, event.getTextChannel(), event.getMember());
+            getModule().getEmbedUtils().sendLog("Rejected", "An appeal has been rejected with the following message:\n\n```" + message + "```", event.getTextChannel(), event.getMember());
             event.getTextChannel().delete().queue();
         });
         return true;

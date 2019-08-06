@@ -9,8 +9,9 @@ public class Ticket {
     private String server;
     private String channel;
     private Level level;
+    private String discordid;
 
-    public Ticket(int id, boolean open, String message, String username, String server, String channel, Level level) {
+    public Ticket(int id, boolean open, String message, String username, String server, String channel, Level level, String discordid) {
         this.id = id;
         this.open = open;
         this.message = message;
@@ -18,25 +19,28 @@ public class Ticket {
         this.server = server;
         this.channel = channel;
         this.level = level;
+        this.discordid = discordid;
     }
 
-    public Ticket(String message) {
-        this(0, true, message, null, null, null, Level.NORMAL);
+    public Ticket(String message, String discordID, String username) {
+        this(0, true, message, username, null, null, Level.NORMAL, discordID);
     }
 
     public int getId() { return id; }
     public boolean getOpen() { return open; }
     public String getMessage() { return message; }
     public String getUsername(boolean nullable) {
-        if(!nullable && username == null) return "";
-        else return username;
+        return nullable ? username : (username != null ? username : "");
     }
     public String getServer(boolean nullable) {
-        if(!nullable && server == null) return "";
-        else return server;
+        return nullable ? server : (server != null ? server : "");
     }
     public String getChannel() { return channel; }
     public Level getLevel() { return level; }
+
+    public String getDiscordID(boolean nullable) {
+        return nullable ? discordid : (discordid != null ? discordid : "");
+    }
 
     public void setId(int id) {this.id = id;}
     public void setOpen(boolean open) { this.open = open; }
@@ -73,6 +77,7 @@ public class Ticket {
     }
 
     public void setLevel(Level level) { this.level = level; }
+    public void setDiscordID(String DiscordID) { this.discordid = DiscordID; }
 
     public enum Level {
         NORMAL,

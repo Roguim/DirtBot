@@ -11,7 +11,6 @@ import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.MessageType;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -20,7 +19,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 // This is a special module that is loaded independently before the ModuleRegistry is initialized.
 // This is where things that are required for other modules should go, such as the information required to initialize the JDA.
@@ -52,6 +50,7 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         spec.define("discord.serverID", "");
 
         spec.define("discord.channels.infoChannelID", "");
+        spec.define("discord.channels.botspamChannelID", "");
 
         List<List<String>> serverListExample = new ArrayList<>();
         serverListExample.add(Arrays.asList("Server 1 Human Name", "Server 1 Code (int, sf3, etc.)", "Server 1 Support Category ID", "Server 1 Admin Support Channel ID", "Server 1 Version"));
@@ -88,6 +87,8 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
 
         @Path("discord.channels.infoChannelID")
         public String infoChannelID;
+        @Path("discord.channels.botspamChannelID")
+        public String botspamChannelID;
 
         @Path("servers")
         public List<List<String>> servers;
@@ -110,10 +111,10 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         // Info Channel Header
         TextChannel infoChannel = DirtBot.getJda().getTextChannelById(getConfig().infoChannelID);
         infoChannel.getIterableHistory().queue((messageHistory) -> {
-            for(Message message : messageHistory) message.delete().queue();
+            for (Message message : messageHistory) message.delete().queue();
             infoChannel.sendMessage(getConfig().botPrefix + "servers").queue((serversCall) ->
                     infoChannel.sendMessage(getConfig().botPrefix + "shop").queue((shopCall) ->
-                            infoChannel.sendMessage(getConfig().botPrefix + "vote").queue((voteCall) -> {
+                            infoChannel.sendMessage(getConfig().botPrefix + "vote").queue(/*(voteCall) -> {
                                 MessageEmbed nitroMessage = new EmbedBuilder()
                                         .setColor(16728319)
                                         .setTitle("<:nitro:582673760298074120> **Nitro Boosts** <:nitro:582673760298074120>")
@@ -126,7 +127,7 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
                                         .addField("__In-Game Rewards__", "Additionally, you will receive **$10,000** in-game coins for Nitro Boosting on a server of your choice.\n Please create a new ticket in <#576254302490722306> to claim your reward.\n\n[**Click me to learn more!**](https://support.discordapp.com/hc/en-us/articles/360028038352-Server-Boosting-)", false)
                                         .build();
                                 infoChannel.sendMessage(nitroMessage).queueAfter(15, TimeUnit.SECONDS);
-                            })));
+                            }))*/)));
         });
     }
 

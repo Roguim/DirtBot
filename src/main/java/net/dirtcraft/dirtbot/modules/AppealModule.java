@@ -120,10 +120,12 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if(event.getAuthor().isBot()) return;
+        if(event.getAuthor().isBot() || event.getAuthor().isFake()) return;
 
         // Appeal Setup Message?
-        if(event.getTextChannel().getParent().getId().equals(getConfig().appealCategoryID)) {
+        if (event.getTextChannel() == null) return;
+        if (event.getTextChannel().getParent() == null) return;
+        if (event.getTextChannel().getParent().getId().equals(getConfig().appealCategoryID)) {
             ticketInformationFilled(event, null, event.getMessage());
         }
     }
@@ -227,7 +229,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     file.toFile().delete();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    DirtBot.pokeTech(e);
+                    DirtBot.pokeDevs(e);
                 }
             }).start();
     }

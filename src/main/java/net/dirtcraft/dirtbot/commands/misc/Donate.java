@@ -4,7 +4,6 @@ import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
 import net.dirtcraft.dirtbot.modules.CommandsModule;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
@@ -25,8 +24,11 @@ public class Donate implements ICommand {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
-                .addField("__DirtShop__", "[**Click me to open the DirtShop**](https://store.dirtcraft.net)\n" +
-                        "All donations go towards the continued development of DirtCraft.", false).build();
+                .setTimestamp(null)
+                .setFooter(null, null)
+                .addField("__DirtCraft Support Shop__", "[Click me to open the **Pixelmon DirtStore**](https://store.pixelmon.gg/)\n" +
+                                "[Click me to open the **Feed The Beast DirtStore**](https://store.dirtcraft.net/)",
+                        false).build();
         event.getTextChannel().sendMessage(response).queue();
         return true;
     }

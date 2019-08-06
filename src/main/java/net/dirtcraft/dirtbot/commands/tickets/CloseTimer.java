@@ -1,5 +1,6 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import com.vdurmont.emoji.EmojiParser;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
@@ -7,11 +8,13 @@ import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @CommandClass(TicketModule.class)
 public class CloseTimer extends CommandTicketStaff {
@@ -22,13 +25,13 @@ public class CloseTimer extends CommandTicketStaff {
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        String reason = String.join(" ", args);
+        String reason = EmojiParser.parseToAliases(String.join(" ", args), EmojiParser.FitzpatrickAction.REMOVE);
 
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
-                .addField("__Ticket Close Timer Set__", "This ticket will be automatically closed in **24 hours.**\n" +
+                .addField("__Ticket Close Timer Set__", "This ticket will be automatically closed in **24 hours**\n" +
                         "To **close now**, please select \u2705" + "\n" +
                         "To **cancel closure**, please select \u274C", false)
-                .addField("__Reason__", reason, false);
+                .addField("__Reason__", "```" + WordUtils.capitalizeFully(reason) + "```", false);
 
         MessageEmbed reviewEmbed = getModule().getEmbedUtils().getReviewEmbed();
 
@@ -40,8 +43,8 @@ public class CloseTimer extends CommandTicketStaff {
                 })
         );
 
-        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queue();
-        event.getTextChannel().getManager().setTopic("This ticket has now pending a review").queue();
+        event.getTextChannel().getManager().setName("pending-review-" + getTicket(event).getId()).queueAfter(1, TimeUnit.SECONDS);
+        event.getTextChannel().getManager().setTopic("This ticket has now pending a review").queueAfter(1, TimeUnit.SECONDS);
 
         return true;
     }

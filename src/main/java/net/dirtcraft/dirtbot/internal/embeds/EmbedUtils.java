@@ -15,6 +15,7 @@ public abstract class EmbedUtils {
 
     public EmbedBuilder getErrorEmbed(String error) {
         return getEmptyEmbed()
+                .setColor(10223635)
                 .addField("__Error!__", error, false);
     }
 
@@ -37,7 +38,8 @@ public abstract class EmbedUtils {
         return getEmptyEmbed()
                 .addField("__Review__",
                         "Please consider leaving a review on your experiences on DirtCraft and the support you have received.\n" +
-                                "We appriciate the review and hope you enjoy your time on DirtCraft!\n" +
-                                "[Click me to leave a **review!**](https://ftbservers.com/server/Z0DoHV0S/dirtcraft-modded-servers)", false).build();
+                                "We appreciate the review and hope you enjoy your time on DirtCraft!\n" +
+                                "[Click me to leave a review on **Pixelmon Servers**](https://pixelmonservers.com/server/75qpnFWv/dirtcraft-pixelmon-reforged)\n" +
+                                "[Click me to leave a review on **FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/dirtcraft-modded-servers)", false).build();
     }
 }

@@ -2,7 +2,9 @@ package net.dirtcraft.dirtbot.modules;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.vdurmont.emoji.EmojiParser;
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.tickets.*;
 import net.dirtcraft.dirtbot.data.Ticket;
@@ -13,6 +15,7 @@ import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.tickets.TicketUtils;
 import net.dirtcraft.dirtbot.utils.tickets.TicketsDatabaseHelper;
+import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -90,7 +93,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                     for(int ticketID : timedCloses.keySet()) {
                         LocalDateTime ticketCloseTime = LocalDateTime.parse(timedCloses.get(ticketID));
                         LocalDateTime now = LocalDateTime.now();
-                        if(ChronoUnit.SECONDS.between(now, ticketCloseTime) <= 60) {
+                        if (ChronoUnit.SECONDS.between(now, ticketCloseTime) <= 60) {
                             Ticket ticket = getDatabaseHelper().getTicket(ticketID);
                             getEmbedUtils().sendLog("Timer Closed", "The user failed to respond to this ticket within 24 hours of the timer being started, so the ticket was automatically closed.", ticket, DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMemberById(DirtBot.getJda().getSelfUser().getId()));
                             getTicketUtils().closeTicket(ticket, "No responses were received for 24 hours after starting a timer, and thus the ticket has been closed automatically. Please submit a new ticket if you need further assistance.", true);
@@ -102,15 +105,19 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             autoCloseTimer.scheduleAtFixedRate(autoClose, 0, getConfig().autocloseInterval * 1000);
         } else {
             EmbedBuilder autoCloseNoInitEmbed = getEmbedUtils().getEmptyEmbed()
-                    .addField("__Initialization Event | Timer Close__", "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
+                    .addField("__Initialization Event | Timer Close__",
+                            "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
             getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
         }
-        if(getConfig().gamesyncInterval > 0) {
+        if (getConfig().gamesyncInterval > 0) {
+
             TimerTask gameSync = new TimerTask() {
                 @Override
                 public void run() {
                     for(Ticket ticket : getDatabaseHelper().getGameTickets()) {
-                        getTicketUtils().createTicket(ticket, null);
+                        final String discordID = ticket.getDiscordID(true);
+                        if (Strings.isNullOrEmpty(discordID)) continue;
+                        getTicketUtils().createTicket(ticket, discordID);
                     }
                 }
             };
@@ -275,7 +282,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         public void postTicketAdminMessage(Ticket ticket) {
             TextChannel adminListChannel = DirtBot.getJda().getTextChannelById(getConfig().adminSupportGenericChannelID);
-            if(ticket.getServer(true) != null) {
+            if (ticket.getServer(true) != null) {
                 for(List<String> serverInfo : DirtBot.getConfig().servers) {
                     if(serverInfo.get(1).equals(ticket.getServer(false))) {
                         adminListChannel = DirtBot.getJda().getTextChannelById(serverInfo.get(3));
@@ -291,8 +298,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         public void updateTicketHeaderMessage(Ticket ticket) {
             TextChannel ticketChannel = DirtBot.getJda().getTextChannelById(ticket.getChannel());
             ticketChannel.getPinnedMessages().queue((messages) -> {
-                for(Message message : messages) {
-                    if(message.getEmbeds().get(0).getFields().get(1).getName().contains("__Ticket Information__")) {
+                for (Message message : messages) {
+                    if (message.getEmbeds().get(0).getFields().get(1).getName().contains("__Ticket Information__")) {
                         message.editMessage(getTicketHeader(ticket)).queue();
                     }
                 }
@@ -327,12 +334,16 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         archiveTicket(DirtBot.getJda().getTextChannelById(ticket.getChannel()), ticket.getId());
     }
 
-    public void archiveTicket(TextChannel channel, int ticketID) {
+    private void archiveTicket(TextChannel channel, int ticketID) {
             List<String> lines = new ArrayList<>();
+            if (channel == null) return;
             channel.getIterableHistory().queue((messageHistory) ->
                 new Thread(() -> {
                     try {
                         for(Message message : Lists.reverse(messageHistory)) {
+                            if (message == null) continue;
+                            if (message.getMember() == null) continue;
+                            if (message.getMember().getEffectiveName() == null) continue;
                             String line = "";
                             line += message.getMember().getEffectiveName();
                             line += " : ";
@@ -354,24 +365,25 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                         file.toFile().delete();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        DirtBot.pokeTech(e);
+                        DirtBot.pokeDevs(e);
                     }
                 }).start());
     }
 
-    public ZipFile getArchive(int ticketID) {
+    private ZipFile getArchive(int ticketID) {
         int diff = ticketID % 100;
         try {
             return new ZipFile("archives" + File.separator + "tickets" + File.separator + "Tickets-" + (ticketID - diff) + "-" + (ticketID - diff + 99) + ".zip");
         } catch (Exception e) {
             e.printStackTrace();
-            DirtBot.pokeTech(e);
+            DirtBot.pokeDevs(e);
         }
         return null;
     }
 
     private void printChannelHeader() {
         EmbedBuilder instructions = getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
                 .addField("__Ticket System Instructions__",
                         "**1.** Briefly describe the issue you're having **inside of this channel**. Make sure to include your username and server." + "\n" +
                                 "**2.** Proceed to your linked ticket. Our staff team will assist you shortly.\n" +
@@ -418,20 +430,39 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         // If a staff member is using ignore, don't go any further
         if(event.getMessage().getContentRaw().startsWith(DirtBot.getConfig().botPrefix + "ignore") && event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return;
 
-        // Ensure length is within boundaries
-        if (event.getMessage().getContentRaw().length() > 1024) {
-            EmbedBuilder response = getEmbedUtils().getErrorEmbed(
-                    "Ticket length exceeds the maximum. The maximum length if 1024 characters, and this ticket is **" + event.getMessage().getContentRaw().length() + "**!" +
-                            "\nPlease use a short message and expand upon your problem once the ticket has been created.");
-            event.getChannel().sendMessage(response.build()).queue((message) -> {
-                message.delete().queueAfter(10, TimeUnit.SECONDS);
-            });
+        if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId()) && !getVerificationDB().isVerified(event.getMember().getUser().getId())) {
+            EmbedBuilder response;
+            String verificationChannelID = getVerification().getConfig().verificationChannelID;
+            response = getEmbedUtils().getErrorEmbed(databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) != null ?
+                    "You already have ticket <#" + databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) + "> open!\nVerify in <#" + verificationChannelID + "> to create more!" :
+                    "You already have a ticket open!\nVerify in <#" + verificationChannelID + "> to create more!");
+
+            event.getChannel().sendMessage(response.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
+
             event.getMessage().delete().queue();
             return;
         }
-        TextChannel ticketChannel = ticketUtils.createTicket(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9]", " "), event.getMember());
+
+        // Ensure length is within boundaries
+        if (event.getMessage().getContentRaw().length() > 1024) {
+            EmbedBuilder response = getEmbedUtils().getErrorEmbed(
+                    "Ticket length exceeds the maximum length of 1024 characters, and this ticket is **" + event.getMessage().getContentRaw().length() + "**!" +
+                            "\nPlease use a short message and expand upon your problem once the ticket has been created.");
+
+            event.getChannel().sendMessage(response.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
+            event.getMessage().delete().queue();
+            return;
+        }
+
+        String uuid = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
+        String username = getVerificationDB().getUsernamefromUUID(uuid);
+
+        String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
+        TextChannel ticketChannel = ticketUtils.createTicket(
+                !reason.isEmpty() && reason.length() > 1 ? reason : "N/A",
+                event.getMember(), username != null ? username : "N/A");
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
-                .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">, \n I have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
+                .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">,\nI have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
         event.getChannel().sendMessage(response.build()).queue((message) -> {
             message.delete().queueAfter(10, TimeUnit.SECONDS);
         });
@@ -447,7 +478,6 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         message += "'s Response...";
 
         event.getTextChannel().getManager().setTopic(message).queue();
-        return;
     }
 
     private void ticketInternalMessageReceived(MessageReceivedEvent event) {
@@ -481,9 +511,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             case "\u274c": // Cancelled
                 getDatabaseHelper().removeConfirmationMessage(message.getId());
                 message.delete().queue();
-                event.getChannel().getHistoryBefore(message.getId(), 1).queue((obj) -> {
-                    obj.getRetrievedHistory().get(0).delete().queue();
-                });
+                event.getChannel().getHistoryBefore(message.getId(), 1).queue((obj) -> obj.getRetrievedHistory().get(0).delete().queue());
                 break;
         }
     }
@@ -502,5 +530,13 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             EmbedBuilder unsubscriptionNotification = getEmbedUtils().getExternalEmbed().addField("__Unubscribed__", "You have successfully unsubscribed to notifications for **" + server + "** tickets!", false);
             event.getUser().openPrivateChannel().queue((privateChannel) -> privateChannel.sendMessage(unsubscriptionNotification.build()).queue());
         }
+    }
+
+    private VerificationDatabaseHelper getVerificationDB() {
+        return DirtBot.getModuleRegistry().getModule(VerificationModule.class).getVerificationDatabase();
+    }
+
+    private VerificationModule getVerification() {
+        return DirtBot.getModuleRegistry().getModule(VerificationModule.class);
     }
 }

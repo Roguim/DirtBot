@@ -10,7 +10,9 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
+import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.time.Instant;
 
 @ModuleClass(classLiteral = ServerRolesModule.class)
@@ -58,36 +60,18 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         if (event.getMessageId().equals("538574783319638026")) {
             switch (event.getReactionEmote().getName().toLowerCase()) {
                 case "stoneblock":
-                    giveRole(event);
-                    break;
                 case "projectozone":
-                    giveRole(event);
-                    break;
                 case "continuum":
-                    giveRole(event);
-                    break;
                 case "infinityevolved":
-                    giveRole(event);
-                    break;
                 case "skyfactory":
-                    giveRole(event);
-                    break;
                 case "revelation":
-                    giveRole(event);
-                    break;
                 case "interactions":
-                    giveRole(event);
-                    break;
                 case "skyadventures":
-                    giveRole(event);
-                    break;
                 case "ultimatereloaded":
-                    giveRole(event);
-                    break;
                 case "skyodyssey":
-                    giveRole(event);
-                    break;
                 case "direwolf20":
+                case "omnifactory":
+                case "pixelmon":
                     giveRole(event);
                     break;
             }
@@ -99,36 +83,18 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         if (event.getMessageId().equals("538574783319638026")) {
             switch (event.getReactionEmote().getName().toLowerCase()) {
                 case "stoneblock":
-                    removeRole(event);
-                    break;
                 case "projectozone":
-                    removeRole(event);
-                    break;
                 case "continuum":
-                    removeRole(event);
-                    break;
                 case "infinityevolved":
-                    removeRole(event);
-                    break;
                 case "skyfactory":
-                    removeRole(event);
-                    break;
                 case "revelation":
-                    removeRole(event);
-                    break;
                 case "interactions":
-                    removeRole(event);
-                    break;
                 case "skyadventures":
-                    removeRole(event);
-                    break;
                 case "ultimatereloaded":
-                    removeRole(event);
-                    break;
                 case "skyodyssey":
-                    removeRole(event);
-                    break;
                 case "direwolf20":
+                case "omnifactory":
+                case "pixelmon":
                     removeRole(event);
                     break;
             }
@@ -138,10 +104,32 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     private void giveRole(MessageReactionAddEvent event) {
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
                 event.getGuild().getController().addRolesToMember(event.getMember(), role).queue());
+
+        EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
+                .setColor(Color.GREEN)
+                .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
+                .setTimestamp(Instant.now());
+        if (!event.getReactionEmote().getName().equalsIgnoreCase("pixelmon")) {
+            embed.setDescription("You are now subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**");
+        } else {
+            embed.setDescription("You are now subscribed to updates regarding **Pixelmon Reforged**");
+        }
+        event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 
     private void removeRole(MessageReactionRemoveEvent event) {
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
                 event.getGuild().getController().removeRolesFromMember(event.getMember(), role).queue());
+
+        EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
+                .setColor(Color.RED)
+                .setTitle("<:redbulletpoint:539273059631104052>**DirtCraft Role Assignments**<:redbulletpoint:539273059631104052>")
+                .setTimestamp(Instant.now());
+        if (!event.getReactionEmote().getName().toLowerCase().equalsIgnoreCase("pixelmon")) {
+                embed.setDescription("You are no longer subscribed to updates regarding the ModPack **" + String.join(" ", StringUtils.splitByCharacterTypeCamelCase(event.getReactionEmote().getName())) + "**");
+        } else {
+            embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
+        }
+        event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }

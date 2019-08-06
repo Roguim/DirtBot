@@ -10,8 +10,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @CommandClass(CommandsModule.class)
 public class Servers implements ICommand {
@@ -22,24 +21,52 @@ public class Servers implements ICommand {
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        String names = "";
-        String ips = "";
-        for(int i = 0; i < DirtBot.getConfig().servers.size(); i++) {
+
+        //DirtBot.getConfig().servers.get(0).sort(String.CASE_INSENSITIVE_ORDER.thenComparing(Comparator.naturalOrder()));
+
+        final ArrayList<String> pixelNames = new ArrayList<String>() {{
+            add("Pixelmon RedStone");
+            add("Pixelmon GlowStone");
+            add("Pixelmon Lapis");
+        }};
+
+        final ArrayList<String> pixelIPs = new ArrayList<String>() {{
+            add("`RED.PIXELMON.GG`");
+            add("`Coming Soon`");
+            add("`Coming Soon`");
+        }};
+
+        ArrayList<String> names = new ArrayList<>();
+
+        ArrayList<String> ips = new ArrayList<>();
+
+        for (int i = 0; i < DirtBot.getConfig().servers.size(); i++) {
             List<String> server = DirtBot.getConfig().servers.get(i);
-            names += server.get(0);
-            ips += "`" + server.get(1).toUpperCase() + ".DIRTCRAFT.GG" + "`";
-            if(!(i + 1 == DirtBot.getConfig().servers.size())) {
-                names += "\n";
-                ips += "\n";
-            }
+            if (server.get(0).toLowerCase().contains("pixel")) continue;
+            names.add(server.get(0));
+            ips.add("`" + server.get(1).toUpperCase() + ".DIRTCRAFT.GG" + "`");
         }
-        MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
-                .setImage("https://cdn.discordapp.com/attachments/470444805931925518/545741732541628416/Max-Resolution.gif")
-                .addField("__Modpacks__", names, true)
-                .addField("__IPs__", ips, true)
-                .addField("__Server Hub__", "`DIRTCRAFT.GG`", false)
+
+        MessageEmbed pixelmon = module.getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
+                .addField("__Pixelmon Servers__", String.join("\n", pixelNames), true)
+                .addField("__Pixelmon IP's__", String.join("\n", pixelIPs), true)
+                .setImage("https://cdn.discordapp.com/attachments/470444805931925518/594983906986426379/ezgif-2-0a96d0e47fd2.gif")
+                .setFooter("You can connect to any server through HUB", null)
+                .addField("__Network Hub__", "`PIXELMON.GG`", false)
                 .build();
-        event.getTextChannel().sendMessage(response).queue();
+
+        MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
+                .setTimestamp(null)
+                .setFooter("You can connect to any server through HUB", null)
+                .setImage("https://cdn.discordapp.com/attachments/470444805931925518/545741732541628416/Max-Resolution.gif")
+                .addField("__ModPacks__", String.join("\n", names), true)
+                .addField("__ModPack IP's__", String.join("\n", ips), true)
+                .addField("__Network Hub__", "`DIRTCRAFT.GG`", false)
+                .build();
+
+        event.getTextChannel().sendMessage(pixelmon).complete(/*message -> message.getTextChannel().sendMessage(response).queue()*/);
+        event.getTextChannel().sendMessage(response).complete();
         return true;
     }
 
@@ -55,7 +82,7 @@ public class Servers implements ICommand {
 
     @Override
     public List<String> aliases() {
-        return Arrays.asList("ip", "ips", "server", "servers", "join", "logon", "login", "play");
+        return Arrays.asList("ip", "ips", "servers", "join", "logon", "login", "play");
     }
 
     @Override
