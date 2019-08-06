@@ -74,10 +74,16 @@ public class SetLevel extends CommandTicketStaff {
         if(level == Ticket.Level.OWNER && ticket.getServer(true) != null) {	
         	String ticketName = event.getChannel().getName();	
         	String server = ticket.getServer(true);	
-        	String newName = ticketName + "-" + server;	
-        	if(!ticketName.contains(server)) {	
-        		event.getTextChannel().getManager().setName(newName).complete();	
-        	}	
+        	String ticketId = String.valueOf(ticket.getId());
+    		if(ticketName.contains(server)) {
+    			ticketName = ticketName.replaceAll("-" + server, "");
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		} else {
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		}
+    		event.getTextChannel().getManager().setName(ticketName).queue();
         }
         return true;
     }
