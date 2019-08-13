@@ -69,10 +69,31 @@ public class SetLevel extends CommandTicketStaff {
                     }
                 }
             });
+        } else if(level == Ticket.Level.URGENT && ticket.getServer(true) != null) {
+        	for(Member user : DirtBot.getJda().getTextChannelById(ticket.getChannel()).getMembers()) {
+        		if(user.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().networkRoleID)) && !user.getUser().isBot()) {
+        			event.getTextChannel().sendMessage(user.getUser().getAsMention()).queue();
+        		}
+        	}
+        }
+        //Add server code to Owner channels	
+        if(level == Ticket.Level.OWNER && ticket.getServer(true) != null) {	
+        	String ticketName = event.getChannel().getName();	
+        	String server = ticket.getServer(true);	
+        	String ticketId = String.valueOf(ticket.getId());
+    		if(ticketName.contains(server)) {
+    			ticketName = ticketName.replaceAll("-" + server, "");
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		} else {
+    			ticketName = ticketName.replaceAll(ticketId, "");
+    			ticketName += server + "-" + ticketId;
+    		}
+    		event.getTextChannel().getManager().setName(ticketName).queue();
         }
         return true;
     }
-
+    
     @Override
     public List<String> aliases() {
         switch(level) {
@@ -80,6 +101,8 @@ public class SetLevel extends CommandTicketStaff {
                 return new ArrayList<>(Arrays.asList("normal", "staff", "mod", "moderator", "helper", "default"));
             case ADMIN:
                 return new ArrayList<>(Arrays.asList("admin", "administrator", "admins"));
+            case URGENT:
+            	return new ArrayList<>(Arrays.asList("urgent", "network", "plshelpme"));
             case OWNER:
                 return new ArrayList<>(Arrays.asList("owner", "julian", "ten", "owners"));
         }
