@@ -141,6 +141,7 @@ public class TicketUtils {
         for (List<String> serverInfo : DirtBot.getConfig().servers) {
             if (serverInfo.get(2).equals(channel.getParent().getId())) return true;
         }
+        if(channel.getParent().getId().equals(module.getConfig().launcherSupportCategoryID)) return true;
         return false;
     }
 
