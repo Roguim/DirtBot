@@ -3,8 +3,8 @@ package net.dirtcraft.dirtbot.utils.verification;
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.modules.VerificationModule;
 
-import javax.annotation.Nullable;
 import java.sql.*;
+import java.util.Optional;
 
 public class VerificationDatabaseHelper {
 
@@ -33,47 +33,38 @@ public class VerificationDatabaseHelper {
         }
     }
 
-    public boolean hasRecord(String discordID) {
+    public Optional<Boolean> hasRecord(String discordID) {
         try (Connection connection = getDatabaseConnection();
              PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
 
             ps.setString(1, discordID);
-            ResultSet rs = ps.executeQuery();
 
-            boolean result = rs.next();
-
-            rs.close();
-
-            return result;
-
-        } catch (SQLException exception) {
-            exception.printStackTrace();
-            DirtBot.pokeDevs(exception);
-            return false;
-        }
-    }
-
-    public String getLastCode(String discordID) {
-        try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT code FROM verification WHERE discordid = ?")) {
-
-            ps.setString(1, discordID);
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) {
-                rs.close();
-                return null;
-            } else {
-                String code = rs.getString("code");
-                rs.close();
-                return code;
+            try (ResultSet rs = ps.executeQuery()) {
+                return Optional.of(rs.next());
             }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
             DirtBot.pokeDevs(exception);
-            return null;
         }
+        return Optional.empty();
+    }
+
+    public Optional<String> getLastCode(String discordID) {
+        try (Connection connection = getDatabaseConnection();
+             PreparedStatement ps = connection.prepareStatement("SELECT code FROM verification WHERE discordid = ?")) {
+
+            ps.setString(1, discordID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return Optional.of(rs.getString("code"));
+            }
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
+        return Optional.empty();
     }
 
     public boolean isVerified(String discordID) {
@@ -81,84 +72,62 @@ public class VerificationDatabaseHelper {
              PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE discordid = ?")) {
 
             ps.setString(1, discordID);
-            ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) {
-                rs.close();
-                return false;
-            } else {
-                boolean result = rs.getString("uuid") != null;
-                rs.close();
-                return result;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getString("uuid") != null;
             }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
             DirtBot.pokeDevs(exception);
-            return false;
         }
+        return false;
     }
 
-    public boolean codeExists(String code) {
+    public Optional<Boolean> codeExists(String code) {
         try (Connection connection = getDatabaseConnection();
              PreparedStatement ps = connection.prepareStatement("SELECT * FROM verification WHERE code = ?")) {
             ps.setString(1, code);
-            ResultSet rs = ps.executeQuery();
 
-            boolean result = rs.next();
-
-            rs.close();
-
-            return result;
+            try (ResultSet rs = ps.executeQuery()) {
+                return Optional.of(rs.next());
+            }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return false;
         }
+        return Optional.empty();
     }
 
-    @Nullable
-    public String getUUIDfromDiscordID(String discordID) {
+    public Optional<String> getUUIDfromDiscordID(String discordID) {
         try (Connection connection = getDatabaseConnection();
              PreparedStatement ps = connection.prepareStatement("SELECT uuid FROM verification WHERE discordid = ?")) {
             ps.setString(1, discordID);
-            ResultSet rs = ps.executeQuery();
 
-            if (!rs.next()) {
-                rs.close();
-                return null;
-            } else {
-                String uuid = rs.getString("uuid");
-                rs.close();
-                return uuid;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return Optional.of(rs.getString("uuid"));
             }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return null;
         }
+        return Optional.empty();
     }
 
-    @Nullable
-    public String getUsernamefromUUID(String uuid) {
-        if (uuid == null) return null;
+    public Optional<String> getUsernamefromUUID(String uuid) {
+        if (uuid == null) return Optional.empty();
 
         try (Connection connection = getDatabaseConnection();
-             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = '" + uuid + "'");
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = connection.prepareStatement("SELECT Username FROM votedata WHERE UUID = ?")) {
+            ps.setString(1, uuid);
 
-            if (!rs.next()) {
-                rs.close();
-                return null;
-            } else {
-                String username = rs.getString("Username");
-                rs.close();
-                return username;
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return Optional.of(rs.getString("Username"));
             }
 
         } catch (SQLException exception) {
             exception.printStackTrace();
-            return null;
         }
+        return Optional.empty();
     }
 }

@@ -94,9 +94,10 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                         LocalDateTime ticketCloseTime = LocalDateTime.parse(timedCloses.get(ticketID));
                         LocalDateTime now = LocalDateTime.now();
                         if (ChronoUnit.SECONDS.between(now, ticketCloseTime) <= 60) {
-                            Ticket ticket = getDatabaseHelper().getTicket(ticketID);
-                            getEmbedUtils().sendLog("Timer Closed", "The user failed to respond to this ticket within 24 hours of the timer being started, so the ticket was automatically closed.", ticket, DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMemberById(DirtBot.getJda().getSelfUser().getId()));
-                            getTicketUtils().closeTicket(ticket, "No responses were received for 24 hours after starting a timer, and thus the ticket has been closed automatically. Please submit a new ticket if you need further assistance.", true);
+                            getDatabaseHelper().getTicket(ticketID).ifPresent(ticket -> {
+                                getEmbedUtils().sendLog("Timer Closed", "The user failed to respond to this ticket within 24 hours of the timer being started, so the ticket was automatically closed.", ticket, DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMemberById(DirtBot.getJda().getSelfUser().getId()));
+                                getTicketUtils().closeTicket(ticket, "No responses were received for 24 hours after starting a timer, and thus the ticket has been closed automatically. Please submit a new ticket if you need further assistance.", true);
+                            });
                         }
                     }
                 }
@@ -450,18 +451,16 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             return;
         }
 
-        String uuid = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
-        String username = getVerificationDB().getUsernamefromUUID(uuid);
+        Optional<String> optionalUUID = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
+        String username = optionalUUID.map(s -> getVerificationDB().getUsernamefromUUID(s).orElse("N/A")).orElse("N/A");
 
         String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
         TextChannel ticketChannel = ticketUtils.createTicket(
                 !reason.isEmpty() && reason.length() > 1 ? reason : "N/A",
-                event.getMember(), username != null ? username : "N/A");
+                event.getMember(), username);
         EmbedBuilder response = getEmbedUtils().getEmptyEmbed()
                 .addField("__**Ticket Created**__", "Hello <@" + event.getAuthor().getId() + ">,\nI have created the channel <#" + ticketChannel.getId() + ">. Our staff team will assist you shortly. Thank you for your patience!", false);
-        event.getChannel().sendMessage(response.build()).queue((message) -> {
-            message.delete().queueAfter(10, TimeUnit.SECONDS);
-        });
+        event.getChannel().sendMessage(response.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
         event.getMessage().delete().queue();
 
         String message = "Awaiting ";
@@ -498,11 +497,12 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     private void confirmationReceived(GuildMessageReactionAddEvent event, Message message) {
         switch(event.getReactionEmote().getName()) {
             case "\u2705": //Confirmed
-                Ticket ticket = getDatabaseHelper().getTicket(message.getChannel().getId());
-                String reason = getDatabaseHelper().getClosureReason(message.getId());
-                getEmbedUtils().sendLog("Closed", "**Reason:** " + reason, ticket, event.getMember());
+                getDatabaseHelper().getTicket(message.getChannel().getId()).ifPresent(ticket -> {
+                    String reason = getDatabaseHelper().getClosureReason(message.getId());
+                    getEmbedUtils().sendLog("Closed", "**Reason:** " + reason, ticket, event.getMember());
 
-                ticketUtils.closeTicket(ticket, reason, true);
+                    ticketUtils.closeTicket(ticket, reason, true);
+                });
                 break;
             case "\u274c": // Cancelled
                 getDatabaseHelper().removeConfirmationMessage(message.getId());

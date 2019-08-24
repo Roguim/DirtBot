@@ -31,7 +31,7 @@ public class ModuleRegistry {
 
     public void registerEventListeners(JDA jda) {
         for(Module module : modules) {
-            if(module.getClass().getAnnotation(ModuleClass.class).eventSubscriber()) jda.addEventListener(module);
+            if (module.getClass().getAnnotation(ModuleClass.class).eventSubscriber()) jda.addEventListener(module);
         }
     }
 

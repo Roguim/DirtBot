@@ -15,6 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 
 import java.time.Instant;
+import java.util.Optional;
 
 @ModuleClass(classLiteral = VerificationModule.class)
 public class VerificationModule extends Module<VerificationModule.ConfigDataVerification, VerificationModule.EmbedUtilsVerification> {
@@ -87,23 +88,25 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
 
         String verificationCode;
 
-        if (database.hasRecord(discordID)) {
-            verificationCode = !database.isVerified(discordID) ? database.getLastCode(discordID) : null;
+        if (database.hasRecord(discordID).orElse(true)) {
+            verificationCode = !database.isVerified(discordID) ? database.getLastCode(discordID).orElse(null) : null;
         } else {
             verificationCode = VerificationUtils.getSaltString();
-            while (database.codeExists(verificationCode)) {
+            while (database.codeExists(verificationCode).orElse(false)) {
                 verificationCode = VerificationUtils.getSaltString();
             }
         }
 
-        if (!database.hasRecord(discordID)) database.createRecord(discordID, verificationCode);
+        if (!database.hasRecord(discordID).orElse(true)) database.createRecord(discordID, verificationCode);
 
-        String uuid = database.getUUIDfromDiscordID(discordID);
-        String username = database.getUsernamefromUUID(uuid);
+        Optional<String> optionalUUID = database.getUUIDfromDiscordID(discordID);
+        Optional<String> username;
+        if (optionalUUID.isPresent()) username = database.getUsernamefromUUID(optionalUUID.get());
+        else username = Optional.empty();
 
         EmbedBuilder verify = verificationCode != null ?
                 getEmbedUtils().getEmptyEmbed().setDescription("Please enter **/verify " + verificationCode + "** in-game to verify your account") :
-                getEmbedUtils().getErrorEmbed("Your account is already verified" + (username != null ? " with **" + username + "**!" : "!"));
+                getEmbedUtils().getErrorEmbed("Your account is already verified" + (username.map(s -> " with **" + s + "**!").orElse("!")));
 
         event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(verify.build()).queue());
 

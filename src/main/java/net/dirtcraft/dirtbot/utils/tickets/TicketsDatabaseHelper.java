@@ -9,6 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 public class TicketsDatabaseHelper {
 
@@ -47,17 +48,12 @@ public class TicketsDatabaseHelper {
             try (
                 PreparedStatement statement2 = con.prepareStatement("SELECT LAST_INSERT_ID()");
                 ResultSet results = statement2.executeQuery()) {
-            
                 if (results.next()) {
                     ticket.setId(results.getInt(1));
                     return ticket;
                 }/* else {
                     // TODO Ticket Not Found After Insertion
                 }*/
-            
-            } catch (SQLException e) {
-            e.printStackTrace();
-            DirtBot.pokeDevs(e);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +68,7 @@ public class TicketsDatabaseHelper {
      * @param id Row id of the ticket in the database
      * @return The fetched ticket
      */
-    public Ticket getTicket(int id) {
+    public Optional<Ticket> getTicket(int id) {
         try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
@@ -82,32 +78,25 @@ public class TicketsDatabaseHelper {
             statement.setInt(1, id);
 
             // Execute Query
-            ResultSet results = statement.executeQuery();
-
-            Ticket ticket;
-            if(results.next()) {
-                ticket = new Ticket(
-                        results.getInt("id"),
-                        true, results.getString("message"),
-                        results.getString("username"),
-                        results.getString("server"),
-                        results.getString("channel"),
-                        Ticket.Level.valueOf(results.getString("level").toUpperCase()),
-                        results.getString("discordid"));
-            } else {
-                ticket = null;
-                // TODO Something Went Wrong (No Ticket Found)
+            try (ResultSet results = statement.executeQuery()) {
+                if (results.next()) {
+                    Ticket ticket = new Ticket(
+                            results.getInt("id"),
+                            true, results.getString("message"),
+                            results.getString("username"),
+                            results.getString("server"),
+                            results.getString("channel"),
+                            Ticket.Level.valueOf(results.getString("level").toUpperCase()),
+                            results.getString("discordid"));
+                    return Optional.of(ticket);
+                }
             }
 
-            // Clean Up
-            results.close();
-
-            return ticket;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeDevs(e);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -116,9 +105,7 @@ public class TicketsDatabaseHelper {
      * @param channel The discord channel id
      * @return The fetched ticket
      */
-    public Ticket getTicket(String channel) {
-        Ticket ticket;
-
+    public Optional<Ticket> getTicket(String channel) {
         try (
             // Establish Database Connection
             Connection con = getDatabaseConnection();
@@ -128,30 +115,24 @@ public class TicketsDatabaseHelper {
             statement.setString(1, channel);
 
             // Execute Query
-            ResultSet results = statement.executeQuery();
-
-            if (results.next()) {
-                ticket = new Ticket(
-                        results.getInt("id"),
-                        true,
-                        results.getString("message"),
-                        results.getString("username"),
-                        results.getString("server"), results.getString("channel"),
-                        Ticket.Level.valueOf(results.getString("level").toUpperCase()),
-                        results.getString("discordid"));
-            } else {
-                ticket = null;
-                // TODO Something Went Wrong (No Ticket Found)
+            try (ResultSet results = statement.executeQuery()) {
+                if (results.next()) {
+                    Ticket ticket = new Ticket(
+                            results.getInt("id"),
+                            true,
+                            results.getString("message"),
+                            results.getString("username"),
+                            results.getString("server"), results.getString("channel"),
+                            Ticket.Level.valueOf(results.getString("level").toUpperCase()),
+                            results.getString("discordid"));
+                    return Optional.of(ticket);
+                }
             }
-
-            // Clean Up
-            results.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeDevs(e);
-            ticket = null;
         }
-        return ticket;
+        return Optional.empty();
     }
 
     /**
@@ -450,13 +431,10 @@ public class TicketsDatabaseHelper {
             statement.setString(1, confirmationMessageId);
 
             // Execute Query
-            ResultSet results = statement.executeQuery();
-            boolean result = results.next();
+            try (ResultSet results = statement.executeQuery()) {
+                return results.next();
+            }
 
-            // Clean Up
-            results.close();
-
-            return result;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeDevs(e);
@@ -475,14 +453,10 @@ public class TicketsDatabaseHelper {
             statement.setString(1, confirmationMessageId);
 
             // Execute Query
-            ResultSet results = statement.executeQuery();
-            String reason = "No reason found.";
-            if (results.next()) reason = results.getString("reason");
+            try (ResultSet results = statement.executeQuery()) {
+                if (results.next()) return results.getString("reason");
+            }
 
-            // Clean Up
-            results.close();
-
-            return reason;
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeDevs(e);
