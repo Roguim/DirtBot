@@ -112,9 +112,9 @@ public class TicketUtils {
         module.getDatabaseHelper().removeAllConfirmationMessages(ticket.getId());
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
         if(review) {
-            EmbedBuilder reviewDM = module.getEmbedUtils().getEmptyEmbed()
-                    .addField("__Ticket Closed__", "Your ticket **#" + ticket.getId() + "** has been closed for the following reason:\n" +
-                            "```" + WordUtils.capitalizeFully(message) + "```", false);
+            EmbedBuilder reviewDM = module.getEmbedUtils().getExternalEmbed()
+                    .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
+                            "```" + message + "```", false);
             for(Member member : getTicketMembers(ticket)) {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
             }

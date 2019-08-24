@@ -55,8 +55,6 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         }
     }
 
-    // DO ALL OF YOUR EVENT LISTENERS DOWN HERE
-    // THIS IS AN EXAMPLE LISTENER IN THIS FORMAT, YOU CAN DELETE THIS ONE IF YOU DON'T NEED IT
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
         if (event.getMessageId().equals("538574783319638026")) {
