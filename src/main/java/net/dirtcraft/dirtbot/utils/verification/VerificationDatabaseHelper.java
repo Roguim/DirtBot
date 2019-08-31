@@ -57,7 +57,7 @@ public class VerificationDatabaseHelper {
             ps.setString(1, discordID);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return Optional.of(rs.getString("code"));
+                if (rs.next()) return Optional.ofNullable(rs.getString("code"));
             }
 
         } catch (SQLException exception) {
@@ -90,7 +90,7 @@ public class VerificationDatabaseHelper {
             ps.setString(1, code);
 
             try (ResultSet rs = ps.executeQuery()) {
-                return Optional.of(rs.next());
+                return Optional.ofNullable(rs.next());
             }
 
         } catch (SQLException exception) {
@@ -105,7 +105,7 @@ public class VerificationDatabaseHelper {
             ps.setString(1, discordID);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return Optional.of(rs.getString("uuid"));
+                if (rs.next()) return Optional.ofNullable(rs.getString("uuid"));
             }
 
         } catch (SQLException exception) {
@@ -122,7 +122,7 @@ public class VerificationDatabaseHelper {
             ps.setString(1, uuid);
 
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return Optional.of(rs.getString("Username"));
+                if (rs.next()) return Optional.ofNullable(rs.getString("Username"));
             }
 
         } catch (SQLException exception) {
