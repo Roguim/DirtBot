@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class CommandRegistry {
 
@@ -70,16 +71,13 @@ public class CommandRegistry {
         // If the command does not require arguments return true
         if(command.args() == null) return true;
 
-        //TODO: TECH FIX PLS
-        // Just iterates through all command arguments and if one is optional, it makes all arguments valid. NEEDS TO BE FIXED
-        for (CommandArgument arg : command.args()) {
-            if (arg.isOptional()) return true;
-        }
+        List<CommandArgument> requiredArgs = command.args().stream().filter(arg -> !arg.isOptional()).collect(Collectors.toList());
 
         // If the command wasn't passed enough arguments return false
-        if(args.size() < command.args().size()) return false;
+        if(args.size() < requiredArgs.size()) return false;
+
         // Cannot use foreach because we need i
-        for(int i = 0; i < command.args().size(); i++) {
+        for(int i = 0; i < requiredArgs.size(); i++) {
 
             // If any of the required arguments and arguments found do not mach up
             if(!command.args().get(i).validArgument(args.get(i))) return false;
