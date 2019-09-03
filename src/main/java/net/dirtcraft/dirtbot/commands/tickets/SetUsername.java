@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(TicketModule.class)
@@ -42,7 +43,7 @@ public class SetUsername extends CommandTicketStaff {
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Username", "Minecraft Username (\"reset\" to clear)", 0, 16)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Username", "Minecraft Username (\"reset\" to clear)", 0, 16)));
     }
 
 }

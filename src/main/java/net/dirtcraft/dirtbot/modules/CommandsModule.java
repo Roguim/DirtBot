@@ -26,6 +26,7 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
 
         // Register Commands
         DirtBot.getCoreModule().registerCommands(
+                new Analytics(this),
                 new Donate(this),
                 new Launcher(this),
                 new Maps(this),
@@ -47,8 +48,8 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBot | 2019");
-        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
+        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
         List<List<String>> mapDownloadsListExample = new ArrayList<>();

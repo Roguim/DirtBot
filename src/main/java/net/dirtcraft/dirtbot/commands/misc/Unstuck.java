@@ -15,7 +15,7 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Unstuck implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
     public Unstuck(CommandsModule module) {
         this.module = module;

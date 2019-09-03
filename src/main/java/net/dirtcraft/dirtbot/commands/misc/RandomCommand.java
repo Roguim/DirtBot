@@ -17,9 +17,11 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class RandomCommand implements ICommand {
 
-    private CommandsModule module;
+    private final CommandsModule module;
 
-    public RandomCommand(CommandsModule module) { this.module = module; }
+    public RandomCommand(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {

@@ -16,9 +16,11 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class ShinyCSharp implements ICommand {
 
-    private CommandsModule module;
+    private final CommandsModule module;
 
-    public ShinyCSharp(CommandsModule module) { this.module = module; }
+    public ShinyCSharp(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {

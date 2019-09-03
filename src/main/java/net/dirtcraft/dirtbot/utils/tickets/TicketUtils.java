@@ -6,7 +6,6 @@ import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.*;
-import org.apache.commons.lang3.text.WordUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class TicketUtils {
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
         if(review) {
             EmbedBuilder reviewDM = module.getEmbedUtils().getExternalEmbed()
-                    .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " - " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
+                    .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " | " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
                             "```" + message + "```", false);
             for(Member member : getTicketMembers(ticket)) {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());

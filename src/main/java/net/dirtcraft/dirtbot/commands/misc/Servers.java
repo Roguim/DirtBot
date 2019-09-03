@@ -15,9 +15,11 @@ import java.util.*;
 @CommandClass(CommandsModule.class)
 public class Servers implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
-    public Servers(CommandsModule module) { this.module = module;}
+    public Servers(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
@@ -31,9 +33,9 @@ public class Servers implements ICommand {
         }};
 
         final ArrayList<String> pixelIPs = new ArrayList<String>() {{
-            add("`RED.PIXELMON.GG`");
-            add("`Coming Soon`");
-            add("`Coming Soon`");
+            add("**RED**.PIXELMON.GG");
+            add("Coming Soon");
+            add("Coming Soon");
         }};
 
         ArrayList<String> names = new ArrayList<>();
@@ -44,7 +46,7 @@ public class Servers implements ICommand {
             List<String> server = DirtBot.getConfig().servers.get(i);
             if (server.get(0).toLowerCase().contains("pixel")) continue;
             names.add(server.get(0));
-            ips.add("`" + server.get(1).toUpperCase() + ".DIRTCRAFT.GG" + "`");
+            ips.add("**" + server.get(1).toUpperCase() + "**.DIRTCRAFT.GG");
         }
 
         MessageEmbed pixelmon = module.getEmbedUtils().getEmptyEmbed()

@@ -17,9 +17,11 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class NotMyDepartment implements ICommand {
 
-    private CommandsModule module;
+    private final CommandsModule module;
 
-    public NotMyDepartment(CommandsModule module) { this.module = module; }
+    public NotMyDepartment(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
@@ -31,7 +33,7 @@ public class NotMyDepartment implements ICommand {
 
     @Override
     public boolean hasPermission(Member member) {
-        if(member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return true;
+        if (member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return true;
         else return false;
     }
 

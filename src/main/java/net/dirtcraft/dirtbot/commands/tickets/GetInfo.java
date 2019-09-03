@@ -7,7 +7,7 @@ import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(TicketModule.class)
@@ -26,7 +26,7 @@ public class GetInfo extends CommandTicketStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("info"));
+        return new ArrayList<>(Collections.singletonList("info"));
     }
 
     @Override

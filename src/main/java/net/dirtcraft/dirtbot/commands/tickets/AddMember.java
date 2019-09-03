@@ -11,10 +11,7 @@ import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 @CommandClass(TicketModule.class)
 public class AddMember extends CommandTicketStaff {
@@ -42,12 +39,12 @@ public class AddMember extends CommandTicketStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("add"));
+        return new ArrayList<>(Collections.singletonList("add"));
     }
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Discord Tag(s)", "Mention(s) for the user(s) you wish to add to the ticket", 1, 0)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Discord Tag(s)", "Mention(s) for the user(s) you wish to add to the ticket", 1, 0)));
     }
 
 }

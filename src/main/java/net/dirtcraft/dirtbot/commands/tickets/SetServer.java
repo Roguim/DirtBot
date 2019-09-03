@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(TicketModule.class)
@@ -49,11 +49,11 @@ public class SetServer extends CommandTicketStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("server"));
+        return new ArrayList<>(Collections.singletonList("server"));
     }
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Server", "Server code for the server (See the server's gamechat channel name for code, use \"reset\" to clear)", 1, 0)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Server", "Server code for the server (See the server's gamechat channel name for code, use \"reset\" to clear)", 1, 0)));
     }
 }

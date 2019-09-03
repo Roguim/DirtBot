@@ -34,12 +34,12 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("database.url", "jdbc:mariadb://localhost:3306/support");
+        spec.define("database.url", "jdbc:mariadb://localhost:3306/verification");
         spec.define("database.user", "");
         spec.define("database.password", "");
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBot | 2019");
-        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
+        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
         spec.define("discord.channels.verificationChannelID", "");

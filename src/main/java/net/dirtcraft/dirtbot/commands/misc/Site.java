@@ -15,7 +15,7 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Site implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
     public Site(CommandsModule module) {
         this.module = module;

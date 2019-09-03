@@ -10,7 +10,7 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(TicketModule.class)
@@ -39,12 +39,12 @@ public class RemoveMember extends CommandTicketStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("remove"));
+        return new ArrayList<>(Collections.singletonList("remove"));
     }
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Discord Tag(s)", "Mention(s) for the user(s) you wish to remove from the ticket", 1, 0)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Discord Tag(s)", "Mention(s) for the user(s) you wish to remove from the ticket", 1, 0)));
     }
 
 }

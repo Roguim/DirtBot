@@ -17,13 +17,15 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Purge implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
-    public Purge(CommandsModule module) { this.module = module; }
+    public Purge(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        for(Message message : event.getTextChannel().getHistoryBefore(event.getMessageId(), Integer.parseInt(args.get(0))).complete().getRetrievedHistory()) {
+        for (Message message : event.getTextChannel().getHistoryBefore(event.getMessageId(), Integer.parseInt(args.get(0))).complete().getRetrievedHistory()) {
             message.delete().queue();
         }
         return true;

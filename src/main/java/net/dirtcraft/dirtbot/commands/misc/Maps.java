@@ -16,19 +16,21 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Maps implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
-    public Maps(CommandsModule module) { this.module = module;}
+    public Maps(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
         String packs = "";
         String dates = "";
-        for(int i = 0; i < module.getConfig().oldMaps.size(); i++) {
+        for (int i = 0; i < module.getConfig().oldMaps.size(); i++) {
             List<String> oldMap = module.getConfig().oldMaps.get(i);
             packs += "[**" + oldMap.get(0) + "**](" + oldMap.get(1) + ")";
             dates += "`" + oldMap.get(2) + "`";
-            if(!(i + 1 == DirtBot.getConfig().servers.size())) {
+            if (!(i + 1 == DirtBot.getConfig().servers.size())) {
                 packs += "\n";
                 dates += "\n";
             }

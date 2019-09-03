@@ -16,7 +16,7 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Ping implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
     public Ping(CommandsModule module) {
         this.module = module;

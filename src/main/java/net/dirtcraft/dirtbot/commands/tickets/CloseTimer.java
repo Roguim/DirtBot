@@ -13,6 +13,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +57,6 @@ public class CloseTimer extends CommandTicketStaff {
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Reason", "Reason for closing the ticket", 1, 1024)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Reason", "Reason for closing the ticket", 1, 1024)));
     }
 }

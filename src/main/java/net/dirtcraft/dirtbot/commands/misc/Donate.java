@@ -15,7 +15,7 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Donate implements ICommand {
 
-    CommandsModule module;
+    private final CommandsModule module;
 
     public Donate(CommandsModule module) {
         this.module = module;

@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +26,10 @@ public class CloseTicket extends CommandTicket {
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
-        String reason = EmojiParser.parseToAliases(String.join(" ", args), EmojiParser.FitzpatrickAction.REMOVE);
+        String reason;
+        if (!args.isEmpty()) reason = EmojiParser.parseToAliases(String.join(" ", args), EmojiParser.FitzpatrickAction.REMOVE);
+        else reason = "No Reason Specified.";
+
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
                 .addField("__Close Ticket__", "Are you sure you want to close this ticket?\n" +
                         "Please confirm or cancel this command by selecting one of the options below.", false)
@@ -54,11 +57,11 @@ public class CloseTicket extends CommandTicket {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("close"));
+        return new ArrayList<>(Collections.singletonList("close"));
     }
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Reason", "Reason for closing the ticket", 1, 1024)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Reason", "Reason for closing the ticket", 1, 1024, true)));
     }
 }

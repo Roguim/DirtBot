@@ -247,7 +247,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         }
 
         public EmbedBuilder getExternalEmbed() {
-            return getEmptyEmbed().setTitle(getConfig().embedTitle.replace(":redbulletpoint:", "\ud83e\udd16"));
+            return getEmptyEmbed();
         }
 
         public void sendLog(String eventName, String eventInfo, Ticket ticket, Member member) {
@@ -266,7 +266,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         public MessageEmbed getTicketHeader(Ticket ticket) {
             String membersFormatted = "";
             boolean hasMember = false;
-            for(Member member : getTicketUtils().getTicketMembers(ticket)) {
+            List<Member> members = getTicketUtils().getTicketMembers(ticket);
+            for(Member member : members) {
                 hasMember = true;
                 membersFormatted += "<@" + member.getUser().getId() + ">, ";
             }
@@ -275,7 +276,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                 .addField("__Ticket Message__", ticket.getMessage(), false)
                 .addField("__Ticket Information__",
                     "**Ticket ID:** " + ticket.getId() + "\n" +
-                    "**Member(s):** " + membersFormatted + "\n" +
+                    "**" + (members.size() != 1 ? "Members" : "Member") + ":** " + membersFormatted + "\n" +
                     "**Username:** " + ticket.getUsername(false) + "\n" +
                     "**Server:** " + ticket.getServer(false).toUpperCase() + "\n" +
                     "**Level:** " + ticket.getLevel().toString().toUpperCase(), false).build();

@@ -10,6 +10,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(TicketModule.class)
@@ -41,6 +42,6 @@ public class SetTicketName extends CommandTicketStaff {
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Name", "Desired name for the ticket. Spaces will be hyphenated", 1, 0)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Name", "Desired name for the ticket. Spaces will be hyphenated", 1, 0)));
     }
 }

@@ -32,8 +32,8 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBot | 2019");
-        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBot :redbulletpoint:");
+        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
         setConfig(new ConfigurationManager<>(ConfigDataChatSentinel.class, spec, "ChatSentinel"));

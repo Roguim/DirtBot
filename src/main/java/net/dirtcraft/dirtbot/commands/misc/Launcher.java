@@ -27,7 +27,11 @@ public class Launcher implements ICommand {
         MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
                 .setTimestamp(null)
                 .setFooter(null, null)
-                .addField("__Dirt Launcher__", "[Click me to download the **Dirt Launcher**](https://dirtcraft.net/launcher/download)",
+                .setTitle("<:redbulletpoint:539273059631104052> **DirtCraft's Dirt Launcher** <:redbulletpoint:539273059631104052>")
+                .addField("__Windows Installer__",
+                        "[**64-Bit**](https://dirtcraft.net/launcher/download/Dirt-Launcher_x64.msi)\n" +
+                        "[**32-Bit**](https://dirtcraft.net/launcher/download/Dirt-Launcher_x86.msi)", false)
+                .addField("__Universal Installer__", "[**All Operating Systems**](https://dirtcraft.net/launcher/download/Dirt-Launcher.jar)",
                         false).build();
         event.getTextChannel().sendMessage(response).queue();
         return true;

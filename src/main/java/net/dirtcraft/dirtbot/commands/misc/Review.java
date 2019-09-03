@@ -1,6 +1,5 @@
 package net.dirtcraft.dirtbot.commands.misc;
 
-import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
@@ -16,9 +15,11 @@ import java.util.List;
 @CommandClass(CommandsModule.class)
 public class Review implements ICommand {
 
-    private CommandsModule module;
+    private final CommandsModule module;
 
-    public Review(CommandsModule module) { this.module = module; }
+    public Review(CommandsModule module) {
+        this.module = module;
+    }
 
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {

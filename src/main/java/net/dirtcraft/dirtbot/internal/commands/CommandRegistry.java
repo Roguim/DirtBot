@@ -57,9 +57,8 @@ public class CommandRegistry {
                     // Attempt to execute the command
                     if(!command.execute(event, args)) {
                         // TODO: ICommand Failed to Execute Error Embed// The command executed successfully, delete the message the player sent
-                    } else {
-                        if (!event.getChannel().getId().equals(DirtBot.getConfig().botspamChannelID)) event.getMessage().delete().queue();
-                    }
+                    } else if (!event.getChannel().getId().equals(DirtBot.getConfig().botspamChannelID)) event.getMessage().delete().queue();
+
                 }
                 return true;
             }
@@ -70,10 +69,18 @@ public class CommandRegistry {
     public boolean validArgs(ICommand command, List<String> args) {
         // If the command does not require arguments return true
         if(command.args() == null) return true;
+
+        //TODO: TECH FIX PLS
+        // Just iterates through all command arguments and if one is optional, it makes all arguments valid. NEEDS TO BE FIXED
+        for (CommandArgument arg : command.args()) {
+            if (arg.isOptional()) return true;
+        }
+
         // If the command wasn't passed enough arguments return false
         if(args.size() < command.args().size()) return false;
         // Cannot use foreach because we need i
         for(int i = 0; i < command.args().size(); i++) {
+
             // If any of the required arguments and arguments found do not mach up
             if(!command.args().get(i).validArgument(args.get(i))) return false;
         }
