@@ -209,7 +209,8 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                 try {
                     for(Message message : Lists.reverse(history)) {
                         String line = "";
-                        line += message.getMember().getEffectiveName();
+                        if (message.getMember() != null) line += message.getMember().getEffectiveName();
+                        else line += "N/A (User has left the discord server)";
                         line += " : ";
                         line += message.getCreationTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
                         line += "> ";
