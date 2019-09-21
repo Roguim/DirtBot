@@ -419,7 +419,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             }
             if(!found) {
                 EmbedBuilder notificationEmbed = getEmbedUtils().getEmptyEmbed()
-                        .addField("__Receive " + serverInfo.get(0) + " Notifications__", "Please react with \uD83D\uDCEC to subscribe to to ticket notifications for **" + serverInfo.get(0) + "**! To unsubscribe, simply click the emote again.\n\n<@&" + DirtBot.getConfig().adminRoleID + "> users will also be pinged when a ticket is escalated to the admin level.", false);
+                        .addField("__**Receive " + serverInfo.get(0) + " Notifications**__", "Please react with \uD83D\uDCEC to subscribe to to ticket notifications for **" + serverInfo.get(0) + "**! To unsubscribe, simply click the emote again.\n\n<@&" + DirtBot.getConfig().adminRoleID + "> users will also be pinged when a ticket is escalated to the admin level.", false);
                 notificationSubChannel.sendMessage(notificationEmbed.build()).queue((message) -> {
                     message.addReaction("\uD83D\uDCEC").queue();
                     ticketNotificationEmbeds.put(serverInfo.get(1).toLowerCase(), message.getId());
