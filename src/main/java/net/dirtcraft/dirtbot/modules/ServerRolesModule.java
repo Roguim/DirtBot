@@ -85,9 +85,11 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
                 case "stoneblock":
                 case "projectozone":
                 case "continuum":
+                case "glacialawakening":
                 case "infinityevolved":
                 case "skyfactory":
                 case "revelation":
+                case "rlcraft":
                 case "interactions":
                 case "skyadventures":
                 case "ultimatereloaded":
