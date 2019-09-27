@@ -301,7 +301,13 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             TextChannel ticketChannel = DirtBot.getJda().getTextChannelById(ticket.getChannel());
             ticketChannel.getPinnedMessages().queue((messages) -> {
                 for (Message message : messages) {
-                    if (message.getEmbeds().get(0).getFields().get(1).getName().contains("__Ticket Information__")) {
+                    if (message.getEmbeds().size() == 0) DirtBot.pokeDevs(new IllegalArgumentException("There is no embed! @ " + ticketChannel.getId()));
+                    final MessageEmbed embed = message.getEmbeds().get(0);
+
+                    if (embed.getFields().size() <= 1) DirtBot.pokeDevs(new IllegalArgumentException("There is not enough fields! @ " + ticketChannel.getId()));
+                    final MessageEmbed.Field field = embed.getFields().get(1);
+
+                    if (field.getName().contains("__Ticket Information__")) {
                         message.editMessage(getTicketHeader(ticket)).queue();
                     }
                 }
