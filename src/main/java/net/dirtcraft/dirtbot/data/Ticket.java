@@ -82,6 +82,7 @@ public class Ticket {
     public enum Level {
         NORMAL,
         ADMIN,
+        URGENT,
         OWNER
     }
 
