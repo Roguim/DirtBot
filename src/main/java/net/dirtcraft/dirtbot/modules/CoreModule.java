@@ -43,6 +43,8 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         spec.define("bot.prefix", "!");
         spec.define("bot.token", "");
 
+        spec.define("discord.roles.donatorRoleID", "591145069810155530");
+        spec.define("discord.roles.boosterRoleID", "581195961813172225");
         spec.define("discord.roles.staffRoleID", "");
         spec.define("discord.roles.adminRoleID", "");
         spec.define("discord.roles.ownerRoleID", "");
@@ -75,6 +77,10 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         @Path("bot.token")
         public String botToken;
 
+        @Path("discord.roles.donatorRoleID")
+        public String donatorRoleID;
+        @Path("discord.roles.boosterRoleID")
+        public String boosterRoleID;
         @Path("discord.roles.staffRoleID")
         public String staffRoleID;
         @Path("discord.roles.adminRoleID")
