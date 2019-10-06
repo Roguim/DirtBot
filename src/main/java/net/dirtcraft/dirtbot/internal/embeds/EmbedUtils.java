@@ -19,10 +19,6 @@ public abstract class EmbedUtils {
         event.getChannel().sendMessage(getErrorEmbed(error).build()).queue(message -> message.delete().queueAfter(10, TimeUnit.SECONDS));
         return false;
     }
-    public boolean sendError(TextChannel channel, String error) {
-        channel.sendMessage(getErrorEmbed(error).build()).queue(message -> message.delete().queueAfter(10, TimeUnit.SECONDS));
-        return false;
-    }
 
     public EmbedBuilder getErrorEmbed(String error) {
         return getEmptyEmbed()
@@ -43,7 +39,8 @@ public abstract class EmbedUtils {
     }
 
     public void sendResponse(MessageEmbed embed, TextChannel channel) {
-        channel.sendMessage(embed).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
+        if (channel.getId().equalsIgnoreCase("538768628351238174")) channel.sendMessage(embed).queue();
+        else channel.sendMessage(embed).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
     }
 
     public MessageEmbed getReviewEmbed() {

@@ -9,7 +9,7 @@ import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @CommandClass(AppealModule.class)
@@ -40,11 +40,11 @@ public class AcceptAppeal extends CommandAppealStaff {
 
     @Override
     public List<String> aliases() {
-        return new ArrayList<>(Arrays.asList("accept"));
+        return new ArrayList<>(Collections.singletonList("accept"));
     }
 
     @Override
     public List<CommandArgument> args() {
-        return new ArrayList<>(Arrays.asList(new CommandArgument("Message", "The message to be sent to the appealer.", 1, 1024)));
+        return new ArrayList<>(Collections.singletonList(new CommandArgument("Message", "The message to be sent to the appealer.", 1, 1024)));
     }
 }

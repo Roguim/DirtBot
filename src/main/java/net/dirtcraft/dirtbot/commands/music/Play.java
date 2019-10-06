@@ -12,6 +12,7 @@ import net.dv8tion.jda.core.managers.AudioManager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,10 +21,9 @@ public class Play extends MusicCommand {
     @Override
     public boolean execute(MessageReceivedEvent event, List<String> args) {
 
-        final String url = "https://www.youtube.com/watch?v=4GFAZBKZVJY";
+        String url = args.get(0);
 
-
-        if (!isUrl(url) && !url.startsWith("ytsearch:")) return sendError(event, "Please enter a valid song URL!");
+        if (!isUrl(url)) url = "ytsearch:" + url;
 
         AudioManager audioManager = event.getGuild().getAudioManager();
         if (!audioManager.isConnected()) return sendError(event, "Please connect me to a voice channel using **!connect**");
@@ -56,11 +56,11 @@ public class Play extends MusicCommand {
 
     @Override
     public List<String> aliases() {
-        return Collections.singletonList("play");
+        return Arrays.asList("play", "music");
     }
 
     @Override
     public List<CommandArgument> args() {
-        return null;//Collections.singletonList(new CommandArgument("URL", "URL of the song you want to play", 1, 0));
+        return Collections.singletonList(new CommandArgument("URL", "URL of the song you want to play", 1, 0));
     }
 }
