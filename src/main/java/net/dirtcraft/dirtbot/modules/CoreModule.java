@@ -103,7 +103,7 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         public List<List<String>> servers;
     }
 
-    public class EmbedUtilsCore extends EmbedUtils {
+    public static class EmbedUtilsCore extends EmbedUtils {
         @Override
         public EmbedBuilder getEmptyEmbed() {
             return null;
