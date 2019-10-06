@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.awt.*;
 import java.time.Instant;
 
-@ModuleClass(classLiteral = ServerRolesModule.class)
+@ModuleClass
 public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServerRoles, ServerRolesModule.EmbedUtilsServerRoles> {
 
     @Override

@@ -55,6 +55,8 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         spec.define("discord.channels.infoChannelID", "");
         spec.define("discord.channels.botspamChannelID", "");
 
+        spec.define("debug.useDBModules", true);
+
         List<List<String>> serverListExample = new ArrayList<>();
         serverListExample.add(Arrays.asList("Server 1 Human Name", "Server 1 Code (int, sf3, etc.)", "Server 1 Support Category ID", "Server 1 Admin Support Channel ID", "Server 1 Version"));
         serverListExample.add(Arrays.asList("Server 2 Human Name", "Server 2 Code (int, sf3, etc.)", "Server 2 Support Category ID", "Server 2 Admin Support Channel ID", "Server 2 Version"));
@@ -98,6 +100,9 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         public String infoChannelID;
         @Path("discord.channels.botspamChannelID")
         public String botspamChannelID;
+
+        @Path("debug.useDBModules")
+        public boolean useDBModules;
 
         @Path("servers")
         public List<List<String>> servers;

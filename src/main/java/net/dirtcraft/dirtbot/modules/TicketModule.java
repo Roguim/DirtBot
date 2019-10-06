@@ -36,7 +36,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@ModuleClass(classLiteral = TicketModule.class)
+@ModuleClass(requiresDatabase = true)
 public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketModule.EmbedUtilsTickets> {
 
     private HashMap<String, String> ticketNotificationEmbeds;

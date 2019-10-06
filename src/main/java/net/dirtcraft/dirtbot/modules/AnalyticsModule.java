@@ -14,7 +14,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.time.Instant;
 
-@ModuleClass(classLiteral = AnalyticsModule.class)
+@ModuleClass(eventSubscriber = false, requiresDatabase = true)
 public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics, AnalyticsModule.EmbedUtilsAnalytics> {
 
     private AnalyticsDatabaseHelper database;
