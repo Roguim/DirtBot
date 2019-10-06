@@ -47,6 +47,7 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         spec.define("discord.roles.boosterRoleID", "581195961813172225");
         spec.define("discord.roles.staffRoleID", "");
         spec.define("discord.roles.adminRoleID", "");
+        spec.define("discord.roles.networkRoleID", "");
         spec.define("discord.roles.ownerRoleID", "");
 
         spec.define("discord.serverID", "");
@@ -85,6 +86,8 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
         public String staffRoleID;
         @Path("discord.roles.adminRoleID")
         public String adminRoleID;
+        @Path("discord.roles.networkRoleID")
+        public String networkRoleID;
         @Path("discord.roles.ownerRoleID")
         public String ownerRoleID;
 

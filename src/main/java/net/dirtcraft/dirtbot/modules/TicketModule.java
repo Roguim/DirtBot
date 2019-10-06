@@ -81,7 +81,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                 new SetServer(this),
                 new SetTicketName(this),
                 new SetUsername(this),
-                new SilentClose(this)
+                new SilentClose(this),
+                new LauncherTickets(this)
         );
 
         // Establish Tasks
@@ -152,6 +153,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         spec.define("discord.channels.adminSupportGenericChannelID", "");
 
         spec.define("discord.categories.supportCategoryID", "");
+        spec.define("discord.categories.launcherSupportCategoryID", "");
         spec.define("discord.categories.ownerSupportCategoryID", "");
 
         setConfig(new ConfigurationManager<>(ConfigDataTickets.class, spec, "Tickets"));
@@ -231,6 +233,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         @Path("discord.categories.supportCategoryID")
         public String supportCategoryID;
+        @Path("discord.categories.launcherSupportCategoryID")
+        public String launcherSupportCategoryID;
         @Path("discord.categories.ownerSupportCategoryID")
         public String ownerSupportCategoryID;
     }
@@ -432,6 +436,25 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                 });
             }
         }
+        
+        boolean launcher = false;
+        //Launcher notification
+        for(Message message : notificationSubChannel.getIterableHistory().complete()) {
+        	if(message.getAuthor().isBot() && message.getEmbeds().size() > 0 && message.getEmbeds().get(0).getFields().size() > 0) {
+        		if(message.getEmbeds().get(0).getFields().get(0).getName().contains("Launcher")) {
+                    ticketNotificationEmbeds.put("launcher", message.getId());
+                    launcher = true;
+        		}
+        	}
+        }
+        if(!launcher) {
+            EmbedBuilder notificationEmbed = getEmbedUtils().getEmptyEmbed()
+                    .addField("__Receive Launcher Notifications__", "Please react with \uD83D\uDCEC to subscribe to to ticket notifications for **Launcher**! To unsubscribe, simply click the emote again.", false);
+            notificationSubChannel.sendMessage(notificationEmbed.build()).queue((message) -> {
+                message.addReaction("\uD83D\uDCEC").queue();
+                ticketNotificationEmbeds.put("launcher", message.getId());
+            });
+        }
     }
 
     private void ticketCreationMessageReceived(MessageReceivedEvent event) {
@@ -525,7 +548,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     private void notificationSubscribed(GuildMessageReactionAddEvent event, Message message) {
         if(message.getEmbeds().size() > 0 && message.getEmbeds().get(0).getFields().size() > 0) {
-            String server = message.getEmbeds().get(0).getFields().get(0).getName().substring(12, message.getEmbeds().get(0).getFields().get(0).getName().length() - 18);
+            String server = message.getEmbeds().get(0).getFields().get(0).getName().substring(10, message.getEmbeds().get(0).getFields().get(0).getName().length() - 16);
             EmbedBuilder subscriptionNotification = getEmbedUtils().getExternalEmbed().addField("__Subscribed__", "You have successfully subscribed to notifications for **" + server + "** tickets!", false);
             event.getUser().openPrivateChannel().queue((privateChannel) -> privateChannel.sendMessage(subscriptionNotification.build()).queue());
         }
