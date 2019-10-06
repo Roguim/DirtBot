@@ -35,6 +35,8 @@ public class CommandRegistry {
         // See if a command with a matching alias is registered
         for(ICommand command : commands) {
             if(command.aliases().contains(commandString)) {
+                // You better start typing!
+                event.getTextChannel().sendTyping().queue();
                 // If a command IS found, make sure that all of the requirements are met.
                 if(!command.hasPermission(event.getMember())) {
                     EmbedBuilder responseEmbed = DirtBot.getModuleRegistry().getModule(command.getClass().getAnnotation(CommandClass.class).value()).getEmbedUtils().getEmptyEmbed()
@@ -69,7 +71,7 @@ public class CommandRegistry {
 
     public boolean validArgs(ICommand command, List<String> args) {
         // If the command does not require arguments return true
-        if(command.args() == null) return true;
+        if (command.args() == null || command.args().isEmpty()) return true;
 
         List<CommandArgument> requiredArgs = command.args().stream().filter(arg -> !arg.isOptional()).collect(Collectors.toList());
 

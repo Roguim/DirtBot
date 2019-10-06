@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
 import java.util.*;
 
-@CommandClass(CommandsModule.class)
+@CommandClass()
 public class Servers implements ICommand {
 
     private final CommandsModule module;
@@ -84,7 +84,7 @@ public class Servers implements ICommand {
 
     @Override
     public List<String> aliases() {
-        return Arrays.asList("ip", "ips", "servers", "join", "logon", "login", "play");
+        return Arrays.asList("ip", "ips", "servers", "join", "logon", "login");
     }
 
     @Override

@@ -5,24 +5,24 @@ import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
 import net.dirtcraft.dirtbot.modules.AnalyticsModule;
-import net.dirtcraft.dirtbot.modules.CommandsModule;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@CommandClass(CommandsModule.class)
+@CommandClass(AnalyticsModule.class)
 public class Analytics implements ICommand {
 
     private final AnalyticsModule analytics;
-    private final CommandsModule module;
 
-    public Analytics(CommandsModule module) {
+    public Analytics() {
         this.analytics = DirtBot.getModuleRegistry().getModule(AnalyticsModule.class);
-        this.module = module;
     }
 
     @Override

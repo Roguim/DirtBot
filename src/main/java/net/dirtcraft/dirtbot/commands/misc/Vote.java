@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import java.util.Arrays;
 import java.util.List;
 
-@CommandClass(CommandsModule.class)
+@CommandClass()
 public class Vote implements ICommand {
 
     private final CommandsModule module;
@@ -27,7 +27,7 @@ public class Vote implements ICommand {
                 .setTimestamp(null)
                 .addField("__Voting Links__", "[**Click me to vote on Minecraft-MP**](https://minecraft-mp.com/server/206809/vote/)\n" +
                                 "[**Click me to vote on Pixelmon Servers**](https://pixelmonservers.com/server/75qpnFWv/vote)\n" +
-                                "[**Click me to vote on FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/vote)",
+                                "[**Click me to vote on FTB Servers**](https://ftbservers.com/server/rDh9a32R/vote)",
                         false)
                 .setFooter("Offline votes will be credited to your account upon login", null)
                 .build();

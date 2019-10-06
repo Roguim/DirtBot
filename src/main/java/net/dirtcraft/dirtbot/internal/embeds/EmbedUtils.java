@@ -5,7 +5,9 @@ import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.MessageEmbed;
 import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -13,10 +15,20 @@ public abstract class EmbedUtils {
 
     public abstract EmbedBuilder getEmptyEmbed();
 
+    public boolean sendError(MessageReceivedEvent event, String error) {
+        event.getChannel().sendMessage(getErrorEmbed(error).build()).queue(message -> message.delete().queueAfter(10, TimeUnit.SECONDS));
+        return false;
+    }
+    public boolean sendError(TextChannel channel, String error) {
+        channel.sendMessage(getErrorEmbed(error).build()).queue(message -> message.delete().queueAfter(10, TimeUnit.SECONDS));
+        return false;
+    }
+
     public EmbedBuilder getErrorEmbed(String error) {
         return getEmptyEmbed()
                 .setColor(10223635)
-                .addField("__Error!__", error, false);
+                .addField("__Error!__", error, false)
+                .setTimestamp(Instant.now());
     }
 
     public EmbedBuilder invalidArgsEmbed(List<CommandArgument> args, String alias) {
@@ -39,7 +51,8 @@ public abstract class EmbedUtils {
                 .addField("__Review__",
                         "Please consider leaving a review on your experiences on DirtCraft and the support you have received.\n" +
                                 "We appreciate the review and hope you enjoy your time on DirtCraft!\n" +
+                                "[Click me to leave a review on **Minecraft-MP**](https://minecraft-mp.com/server/206809/comments/)" + "\n" +
                                 "[Click me to leave a review on **Pixelmon Servers**](https://pixelmonservers.com/server/75qpnFWv/dirtcraft-pixelmon-reforged)\n" +
-                                "[Click me to leave a review on **FTB Servers**](https://ftbservers.com/server/Z0DoHV0S/dirtcraft-modded-servers)", false).build();
+                                "[Click me to leave a review on **FTB Servers**](https://ftbservers.com/server/rDh9a32R/dirtcraft-modded-network)", false).build();
     }
 }

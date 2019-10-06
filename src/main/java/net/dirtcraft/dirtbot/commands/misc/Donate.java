@@ -12,7 +12,7 @@ import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
 import java.util.Arrays;
 import java.util.List;
 
-@CommandClass(CommandsModule.class)
+@CommandClass()
 public class Donate implements ICommand {
 
     private final CommandsModule module;

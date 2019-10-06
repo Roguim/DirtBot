@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@CommandClass(CommandsModule.class)
+@CommandClass()
 public class Versions implements ICommand {
 
     private final CommandsModule module;

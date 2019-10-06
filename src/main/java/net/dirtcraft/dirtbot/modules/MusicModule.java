@@ -3,52 +3,48 @@ package net.dirtcraft.dirtbot.modules;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
 import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.misc.Analytics;
+import net.dirtcraft.dirtbot.commands.music.Connect;
+import net.dirtcraft.dirtbot.commands.music.Disconnect;
+import net.dirtcraft.dirtbot.commands.music.Play;
+import net.dirtcraft.dirtbot.commands.music.Volume;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dirtcraft.dirtbot.utils.analytics.AnalyticsDatabaseHelper;
+import net.dirtcraft.dirtbot.utils.music.MusicUtils;
 import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.time.Instant;
 
-@ModuleClass(classLiteral = AnalyticsModule.class)
-public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics, AnalyticsModule.EmbedUtilsAnalytics> {
+@ModuleClass(classLiteral = MusicModule.class)
+public class MusicModule extends Module<MusicModule.ConfigDataMusic, MusicModule.EmbedUtilsMusic> {
 
-    private AnalyticsDatabaseHelper database;
+    private MusicUtils musicUtils;
 
     @Override
     public void initialize() {
-        setEmbedUtils(new AnalyticsModule.EmbedUtilsAnalytics());
-        database = new AnalyticsDatabaseHelper(this);
-        DirtBot.getCoreModule().registerCommands(new Analytics());
+        setEmbedUtils(new EmbedUtilsMusic());
+        musicUtils = new MusicUtils(this);
+        DirtBot.getCoreModule().registerCommands(
+                new Connect(),
+                new Disconnect(),
+                new Play(),
+                new Volume());
     }
 
     @Override
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("database.url", "jdbc:mariadb://localhost:3306/analytics");
-        spec.define("database.user", "");
-        spec.define("database.password", "");
-
         spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
-        spec.define("discord.embeds.title", "<:redbulletpoint:539273059631104052> DirtCraft's DirtBOT <:redbulletpoint:539273059631104052>");
+        spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
-        setConfig(new ConfigurationManager<>(AnalyticsModule.ConfigDataAnalytics.class, spec, "Analytics"));
+        setConfig(new ConfigurationManager<>(ConfigDataMusic.class, spec, "Music"));
     }
 
-    public static class ConfigDataAnalytics implements IConfigData {
-        @Path("database.url")
-        public String databaseUrl;
-        @Path("database.user")
-        public String databaseUser;
-        @Path("database.password")
-        public String databasePassword;
-
+    public static class ConfigDataMusic implements IConfigData {
         @Path("discord.embeds.footer")
         public String embedFooter;
         @Path("discord.embeds.title")
@@ -57,7 +53,7 @@ public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics,
         public int embedColor;
     }
 
-    public class EmbedUtilsAnalytics extends EmbedUtils {
+    public class EmbedUtilsMusic extends EmbedUtils {
         @Override
         public EmbedBuilder getEmptyEmbed() {
             return new EmbedBuilder()
@@ -68,8 +64,7 @@ public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics,
         }
     }
 
-    public AnalyticsDatabaseHelper getDatabase() {
-        return database;
+    public MusicUtils getUtils() {
+        return musicUtils;
     }
-
 }
