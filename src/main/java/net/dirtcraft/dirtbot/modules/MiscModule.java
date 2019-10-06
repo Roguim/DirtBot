@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@ModuleClass(classLiteral = MiscModule.class)
+@ModuleClass
 public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.EmbedUtilsMisc> {
 
     private final NumberFormat numberFormat = NumberFormat.getInstance();

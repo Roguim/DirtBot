@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-@ModuleClass(classLiteral = ChatSentinel.class)
+@ModuleClass
 public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, ChatSentinel.EmbedUtilsChatSentinel> {
 
     @Override

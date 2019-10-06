@@ -17,7 +17,7 @@ import net.dv8tion.jda.core.EmbedBuilder;
 
 import java.time.Instant;
 
-@ModuleClass(classLiteral = MusicModule.class)
+@ModuleClass(eventSubscriber = false)
 public class MusicModule extends Module<MusicModule.ConfigDataMusic, MusicModule.EmbedUtilsMusic> {
 
     private MusicUtils musicUtils;

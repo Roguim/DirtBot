@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@ModuleClass(classLiteral = CommandsModule.class, eventSubscriber = false)
+@ModuleClass(eventSubscriber = false)
 public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, CommandsModule.EmbedUtilsCommands> {
 
     @Override

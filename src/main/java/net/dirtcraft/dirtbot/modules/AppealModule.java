@@ -34,7 +34,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-@ModuleClass(classLiteral = AppealModule.class)
+@ModuleClass
 public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealModule.EmbedUtilsAppeals> {
 
     private List<Appeal> incompleteAppeals;

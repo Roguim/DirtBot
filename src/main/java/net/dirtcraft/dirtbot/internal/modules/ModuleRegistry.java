@@ -13,7 +13,7 @@ public class ModuleRegistry {
 
     private List<Module> modules;
 
-    public ModuleRegistry() {
+    public ModuleRegistry(CoreModule coreModule) {
         modules = new ArrayList<>();
 
         try {
@@ -21,7 +21,8 @@ public class ModuleRegistry {
             Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(ModuleClass.class);
 
             for (Class<?> module : annotatedClasses) {
-                modules.add((Module) module.cast(module.getAnnotation(ModuleClass.class).classLiteral().newInstance()));
+                if(!coreModule.getConfig().useDBModules && module.getAnnotation(ModuleClass.class).requiresDatabase()) continue;
+                modules.add((Module) module.cast(module.getDeclaredConstructor().newInstance()));
             }
         } catch (Exception e) {
             e.printStackTrace();

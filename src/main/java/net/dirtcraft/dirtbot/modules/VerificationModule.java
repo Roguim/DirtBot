@@ -17,7 +17,7 @@ import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
 import java.time.Instant;
 import java.util.Optional;
 
-@ModuleClass(classLiteral = VerificationModule.class)
+@ModuleClass(requiresDatabase = true)
 public class VerificationModule extends Module<VerificationModule.ConfigDataVerification, VerificationModule.EmbedUtilsVerification> {
 
     private VerificationDatabaseHelper database;

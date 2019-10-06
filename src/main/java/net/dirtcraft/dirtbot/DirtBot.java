@@ -38,7 +38,7 @@ public class DirtBot {
         coreModule.initialize();
 
         // Initialize Module Registry
-        moduleRegistry = new ModuleRegistry();
+        moduleRegistry = new ModuleRegistry(coreModule);
 
         // Initialize Module Configurations
         moduleRegistry.initializeModuleConfigurations();
