@@ -21,8 +21,9 @@ public class ModuleRegistry {
             Set<Class<?>> annotatedClasses = reflections.getTypesAnnotatedWith(ModuleClass.class);
 
             for (Class<?> module : annotatedClasses) {
+                if (!runningFromIde() && module.getAnnotation(ModuleClass.class).experimental()) continue;
                 if(!coreModule.getConfig().useDBModules && module.getAnnotation(ModuleClass.class).requiresDatabase()) continue;
-                modules.add((Module) module.cast(module.getDeclaredConstructor().newInstance()));
+                modules.add((Module) module.cast(module.newInstance()));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,5 +55,10 @@ public class ModuleRegistry {
             if(clazz.isInstance(module)) return clazz.cast(module);
         }
         return null;
+    }
+
+    public boolean runningFromIde() {
+        String classPath = System.getProperty("java.class.path");
+        return classPath.contains("idea_rt.jar");
     }
 }

@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ModuleClass {
+    boolean experimental() default false;
     boolean eventSubscriber() default true;
     boolean requiresDatabase() default false;
 }
