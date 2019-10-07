@@ -146,7 +146,7 @@ public class PopulateTicket extends CommandTicketStaff {
         for(User users : getModule().getTicketUtils().getNotificationSubscribers(ticket, getModule())) {
             pingMessage += "<@" + users.getId() + "> ";
         }
-        if(updateLevel) {
+        if(updateLevel || server != null) {
             event.getTextChannel().sendMessage(pingMessage).queue();
         }
         
