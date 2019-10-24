@@ -1,13 +1,13 @@
 package net.dirtcraft.dirtbot.utils.appeals;
 
-import net.dirtcraft.dirtbot.data.Appeal;
-import net.dirtcraft.dirtbot.modules.AppealModule;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.PermissionOverride;
-import net.dv8tion.jda.core.entities.TextChannel;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.dirtcraft.dirtbot.data.Appeal;
+import net.dirtcraft.dirtbot.modules.AppealModule;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 public class AppealUtils {
 

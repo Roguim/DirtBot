@@ -1,16 +1,23 @@
 package net.dirtcraft.dirtbot.utils.tickets;
 
-import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.data.Ticket;
-import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+import javax.annotation.Nullable;
+
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.data.Ticket;
+import net.dirtcraft.dirtbot.modules.TicketModule;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 public class TicketUtils {
 
@@ -51,7 +58,7 @@ public class TicketUtils {
 
     public TextChannel createTicket(Ticket ticket, Member member) {
         Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
-        TextChannel ticketChannel = (TextChannel) server.getController().createTextChannel(Integer.toString(ticket.getId()))
+        TextChannel ticketChannel = (TextChannel) server.createTextChannel(Integer.toString(ticket.getId()))
                 .setParent(server.getCategoryById(module.getConfig().supportCategoryID))
                 .addPermissionOverride(member, EnumSet.of(Permission.MESSAGE_READ), null)
                 .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
@@ -70,7 +77,7 @@ public class TicketUtils {
         Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
         Member member = server.getMemberById(discordID);
         if (member == null) return null;
-        TextChannel ticketChannel = (TextChannel) server.getController().createTextChannel(Integer.toString(ticket.getId()))
+        TextChannel ticketChannel = (TextChannel) server.createTextChannel(Integer.toString(ticket.getId()))
                 .setParent(server.getCategoryById(module.getConfig().supportCategoryID))
                 .addPermissionOverride(member, EnumSet.of(Permission.MESSAGE_READ), null)
                 .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
@@ -148,10 +155,10 @@ public class TicketUtils {
         List<User> results = new ArrayList<>();
 
         if(ticket.getServer(true) != null) {
-            Message message = DirtBot.getJda().getTextChannelById(module.getConfig().notificationChannelID).getMessageById(module.getTicketNotificationEmbeds().get(ticket.getServer(false).toLowerCase())).complete();
+            Message message = DirtBot.getJda().getTextChannelById(module.getConfig().notificationChannelID).retrieveMessageById(module.getTicketNotificationEmbeds().get(ticket.getServer(false).toLowerCase())).complete();
             for(MessageReaction reaction : message.getReactions()) {
                 if(reaction.getReactionEmote().getName().equals("\uD83D\uDCEC")) {
-                    for(User user : reaction.getUsers().complete()) {
+                    for(User user : reaction.retrieveUsers()) {
                         if(!user.isBot()) results.add(user);
                     }
                 }

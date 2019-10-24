@@ -1,20 +1,33 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.misc.*;
+import net.dirtcraft.dirtbot.commands.misc.Donate;
+import net.dirtcraft.dirtbot.commands.misc.Launcher;
+import net.dirtcraft.dirtbot.commands.misc.Maps;
+import net.dirtcraft.dirtbot.commands.misc.Ping;
+import net.dirtcraft.dirtbot.commands.misc.Purge;
+import net.dirtcraft.dirtbot.commands.misc.RandomCommand;
+import net.dirtcraft.dirtbot.commands.misc.Review;
+import net.dirtcraft.dirtbot.commands.misc.Servers;
+import net.dirtcraft.dirtbot.commands.misc.ShinyCSharp;
+import net.dirtcraft.dirtbot.commands.misc.Site;
+import net.dirtcraft.dirtbot.commands.misc.Unstuck;
+import net.dirtcraft.dirtbot.commands.misc.Versions;
+import net.dirtcraft.dirtbot.commands.misc.Vote;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dv8tion.jda.core.EmbedBuilder;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 @ModuleClass(eventSubscriber = false)
 public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, CommandsModule.EmbedUtilsCommands> {

@@ -1,18 +1,18 @@
 package net.dirtcraft.dirtbot.commands.misc;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
 import net.dirtcraft.dirtbot.modules.CommandsModule;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass()
 public class Purge implements ICommand {

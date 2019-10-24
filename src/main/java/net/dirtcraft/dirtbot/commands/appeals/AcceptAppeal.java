@@ -1,16 +1,16 @@
 package net.dirtcraft.dirtbot.commands.appeals;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.dirtcraft.dirtbot.internal.commands.CommandAppealStaff;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.modules.AppealModule;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass(AppealModule.class)
 public class AcceptAppeal extends CommandAppealStaff {

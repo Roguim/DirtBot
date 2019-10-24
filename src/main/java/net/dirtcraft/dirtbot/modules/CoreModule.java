@@ -1,7 +1,13 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandRegistry;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
@@ -9,16 +15,11 @@ import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageType;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageType;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 // This is a special module that is loaded independently before the ModuleRegistry is initialized.
 // This is where things that are required for other modules should go, such as the information required to initialize the JDA.

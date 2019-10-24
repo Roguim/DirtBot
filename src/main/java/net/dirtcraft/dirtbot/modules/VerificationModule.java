@@ -1,7 +1,11 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.time.Instant;
+import java.util.Optional;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
@@ -10,12 +14,9 @@ import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 import net.dirtcraft.dirtbot.utils.verification.VerificationUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-
-import java.time.Instant;
-import java.util.Optional;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 @ModuleClass(requiresDatabase = true)
 public class VerificationModule extends Module<VerificationModule.ConfigDataVerification, VerificationModule.EmbedUtilsVerification> {

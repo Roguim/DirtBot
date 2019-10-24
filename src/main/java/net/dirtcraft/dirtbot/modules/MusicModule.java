@@ -1,7 +1,10 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.time.Instant;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.music.Connect;
 import net.dirtcraft.dirtbot.commands.music.Disconnect;
@@ -13,9 +16,7 @@ import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.music.MusicUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
-
-import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
 
 @ModuleClass(eventSubscriber = false, experimental = true)
 public class MusicModule extends Module<MusicModule.ConfigDataMusic, MusicModule.EmbedUtilsMusic> {

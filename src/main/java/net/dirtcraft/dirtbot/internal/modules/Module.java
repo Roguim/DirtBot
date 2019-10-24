@@ -3,7 +3,7 @@ package net.dirtcraft.dirtbot.internal.modules;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public abstract class Module<T extends IConfigData, U extends EmbedUtils> extends ListenerAdapter {
 

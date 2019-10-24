@@ -1,18 +1,21 @@
 package net.dirtcraft.dirtbot;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.security.auth.login.LoginException;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
 import net.dirtcraft.dirtbot.modules.MiscModule;
 import net.dirtcraft.dirtbot.modules.VerificationModule;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import javax.security.auth.login.LoginException;
-import java.util.ArrayList;
-import java.util.List;
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Activity.ActivityType;
 
 // You would rarely ever have to modify this class. New commands, features, etc. all belong in modules.
 public class DirtBot {
@@ -32,7 +35,7 @@ public class DirtBot {
                 .setToken(getConfig().botToken)
                 .build()
                 .awaitReady();
-        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "Booting Up...", "https://www.twitch.tv/dirtcraft/"));
+        jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, "Booting Up...", "https://www.twitch.tv/dirtcraft/"));
 
         // Finish Primary Module Initialization
         coreModule.initialize();
@@ -59,7 +62,7 @@ public class DirtBot {
         moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
 
         System.out.println("DirtBot is now initialized");
-        jda.getPresence().setGame(Game.of(Game.GameType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
+        jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
 
     }
 

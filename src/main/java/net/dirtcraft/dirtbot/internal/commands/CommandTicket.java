@@ -1,13 +1,14 @@
 package net.dirtcraft.dirtbot.internal.commands;
 
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import javax.annotation.Nullable;
-import java.util.Optional;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public abstract class CommandTicket implements ICommand {
 

@@ -1,7 +1,7 @@
 package net.dirtcraft.dirtbot.internal.commands;
 
 import net.dirtcraft.dirtbot.modules.AppealModule;
-import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 public abstract class CommandAppealStaff extends CommandStaff {
 

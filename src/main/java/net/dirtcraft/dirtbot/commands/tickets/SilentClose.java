@@ -1,15 +1,15 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass(TicketModule.class)
 public class SilentClose extends CommandTicketStaff {

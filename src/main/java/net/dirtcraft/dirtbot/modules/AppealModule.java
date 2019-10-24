@@ -1,26 +1,5 @@
 package net.dirtcraft.dirtbot.modules;
 
-import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.conversion.Path;
-import com.google.common.collect.Lists;
-import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.appeals.AcceptAppeal;
-import net.dirtcraft.dirtbot.commands.appeals.RejectAppeal;
-import net.dirtcraft.dirtbot.data.Appeal;
-import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
-import net.dirtcraft.dirtbot.internal.configs.IConfigData;
-import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
-import net.dirtcraft.dirtbot.internal.modules.Module;
-import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dirtcraft.dirtbot.utils.appeals.AppealUtils;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,8 +10,39 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.conversion.Path;
+import com.google.common.collect.Lists;
+
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.commands.appeals.AcceptAppeal;
+import net.dirtcraft.dirtbot.commands.appeals.RejectAppeal;
+import net.dirtcraft.dirtbot.data.Appeal;
+import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
+import net.dirtcraft.dirtbot.internal.configs.IConfigData;
+import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
+import net.dirtcraft.dirtbot.internal.modules.Module;
+import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
+import net.dirtcraft.dirtbot.utils.appeals.AppealUtils;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 
 @ModuleClass
 public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealModule.EmbedUtilsAppeals> {
@@ -134,7 +144,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
         if(event.getUser().isBot()) return;
 
-        event.getChannel().getMessageById(event.getMessageId()).queue((message) -> {
+        event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
             if(!message.getAuthor().isBot()) return;
 
             // Appeal Creation?
@@ -212,7 +222,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                         if (message.getMember() != null) line += message.getMember().getEffectiveName();
                         else line += "N/A (User has left the discord server)";
                         line += " : ";
-                        line += message.getCreationTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
+                        line += message.getTimeCreated().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
                         line += "> ";
                         line += message.getContentDisplay();
                         for(MessageEmbed embed : message.getEmbeds()) {
@@ -244,7 +254,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                                 "**4.** Please wait patiently. You're more likely to have your appeal accepted if you're kind and respectful towards staff.", false);
         TextChannel appealChannel = DirtBot.getJda().getTextChannelById(getConfig().appealChannelID);
         boolean messageFound = false;
-        List<Message> pinnedMessagesAppeal = appealChannel.getPinnedMessages().complete();
+        List<Message> pinnedMessagesAppeal = appealChannel.retrievePinnedMessages().complete();
         for (Message message : pinnedMessagesAppeal) {
             if (message.getEmbeds().size() > 0 && message.getAuthor().isBot() && message.getEmbeds().get(0).getFields().get(0).getName().contains(instructions.getFields().get(0).getName())) {
                 message.editMessage(instructions.build()).complete();
@@ -287,7 +297,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                 return;
             }
         }
-        server.getController().createTextChannel(event.getMember().getEffectiveName())
+        server.createTextChannel(event.getMember().getEffectiveName())
                 .setParent(server.getCategoryById(getConfig().appealCategoryID))
                 .addPermissionOverride(event.getMember(), EnumSet.of(Permission.MESSAGE_READ), null)
                 .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
@@ -319,7 +329,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                 // Username Prompt Answered
                 if (appeal.getUsername() == null) {
                     appeal.setUsername(message.getContentDisplay());
-                    message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                    message.getChannel().retrievePinnedMessages().queue((pinnedMessages) -> {
                         EmbedBuilder appealServerEmbed = getEmbedUtils().getEmptyEmbed()
                                 .addField("__Server__", "Please send the server code below. This can be found by looking at the server's gamechat. Send what you see following the hyphen (-).", false);
                         pinnedMessages.get(0).editMessage(appealServerEmbed.build()).queue();
@@ -333,7 +343,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                     }
                     if(validServer) {
                         appeal.setServer(message.getContentDisplay().toUpperCase());
-                        message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                        message.getChannel().retrievePinnedMessages().queue((pinnedMessages) -> {
                             EmbedBuilder appealPunishmentTypeEmbed = getEmbedUtils().getEmptyEmbed()
                                     .addField("__Punishment Type__", "Please select your punishment type:\n" +
                                             "Mute [\uD83D\uDD07]\n" +
@@ -358,7 +368,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                                 appeal.setPunishmentType(Appeal.PunishmentType.BAN);
                                 break;
                         }
-                        message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                        message.getChannel().retrievePinnedMessages().queue((pinnedMessages) -> {
                             EmbedBuilder appealStaffEmbed = getEmbedUtils().getEmptyEmbed()
                                     .addField("__Staff Member__", "Please mention (@) the staff member who punished you.", false);
                             pinnedMessages.get(0).editMessage(appealStaffEmbed.build()).queue();
@@ -372,7 +382,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                         if(member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
                             found = true;
                             appeal.setStaff(member.getUser().getId());
-                            message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                            message.getChannel().retrievePinnedMessages().queue((pinnedMessages) -> {
                                 EmbedBuilder appealExplanationEmbed = getEmbedUtils().getEmptyEmbed()
                                         .addField("__Explanation__", "Please explain why your punishment should be changed or removed.", false);
                                 pinnedMessages.get(0).editMessage(appealExplanationEmbed.build()).queue();
@@ -391,7 +401,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
                 // Explanation Answered
                 } else if(appeal.getExplanation() == null) {
                     appeal.setExplanation(message.getContentRaw());
-                    message.getChannel().getPinnedMessages().queue((pinnedMessages) -> {
+                    message.getChannel().retrievePinnedMessages().queue((pinnedMessages) -> {
                         EmbedBuilder appealHeaderEmbed = getEmbedUtils().getEmptyEmbed()
                                 .addField("__New Appeal__", getAppealUtils().getAppealInfo(appeal), false);
                         pinnedMessages.get(0).editMessage(appealHeaderEmbed.build()).queue();
