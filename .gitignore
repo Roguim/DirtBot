@@ -31,3 +31,4 @@ configs/
 hs_err_pid*
 *.lock
 *.bin
+/.gradle/

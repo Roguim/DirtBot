@@ -1,20 +1,22 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
-import com.vdurmont.emoji.EmojiParser;
-import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
-import net.dirtcraft.dirtbot.internal.commands.CommandClass;
-import net.dirtcraft.dirtbot.internal.commands.CommandTicket;
-import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageEmbed;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import org.apache.commons.lang3.text.WordUtils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.lang3.text.WordUtils;
+
+import com.vdurmont.emoji.EmojiParser;
+
+import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
+import net.dirtcraft.dirtbot.internal.commands.CommandClass;
+import net.dirtcraft.dirtbot.internal.commands.CommandTicket;
+import net.dirtcraft.dirtbot.modules.TicketModule;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass(TicketModule.class)
 public class CloseTicket extends CommandTicket {

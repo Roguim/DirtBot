@@ -1,13 +1,14 @@
 package net.dirtcraft.dirtbot.internal.modules;
 
-import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.modules.CoreModule;
-import net.dv8tion.jda.core.JDA;
-import org.reflections.Reflections;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import org.reflections.Reflections;
+
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.modules.CoreModule;
+import net.dv8tion.jda.api.JDA;
 
 public class ModuleRegistry {
 

@@ -10,11 +10,11 @@ import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageReaction;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass(TicketModule.class)
 public class LauncherTickets extends CommandTicketStaff {
@@ -30,10 +30,10 @@ public class LauncherTickets extends CommandTicketStaff {
         String eventInfo = "**Launcher Ticket Created**";
         getModule().getEmbedUtils().sendLog("Ticket Modified", eventInfo, ticket, event.getMember());
         String pingMessage = "";
-        Message message = DirtBot.getJda().getTextChannelById(getModule().getConfig().notificationChannelID).getMessageById(getModule().getTicketNotificationEmbeds().get("launcher")).complete();
+        Message message = DirtBot.getJda().getTextChannelById(getModule().getConfig().notificationChannelID).retrieveMessageById(getModule().getTicketNotificationEmbeds().get("launcher")).complete();
         for(MessageReaction reaction : message.getReactions()) {
             if(reaction.getReactionEmote().getName().equals("\uD83D\uDCEC")) {
-                for(User user : reaction.getUsers().complete()) {
+                for(User user : reaction.retrieveUsers().complete()) {
                     if(!user.isBot()) pingMessage += "<@" + user.getId() + "> ";
                 }
             }

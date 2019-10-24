@@ -1,15 +1,15 @@
 package net.dirtcraft.dirtbot.internal.commands;
 
-import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.internal.modules.Module;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.internal.modules.Module;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CommandRegistry {
 

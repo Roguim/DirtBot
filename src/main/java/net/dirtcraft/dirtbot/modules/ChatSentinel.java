@@ -1,23 +1,24 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.guild.member.GuildMemberNickChangeEvent;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @ModuleClass
 public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, ChatSentinel.EmbedUtilsChatSentinel> {
@@ -85,7 +86,7 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
     }
 
     @Override
-    public void onGuildMemberNickChange(GuildMemberNickChangeEvent event) {
+    public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) {
         ArrayList<String> names = new ArrayList<>();
         Role staffRole = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getRoleById(DirtBot.getConfig().staffRoleID);
         if (event.getMember().getRoles().contains(staffRole)) return;
@@ -99,8 +100,8 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
             }
         });
 
-        if (names.contains(event.getNewNick())) {
-            event.getGuild().getController().setNickname(event.getMember(), event.getPrevNick()).queue();
+        if (names.contains(event.getNewNickname())) {
+            event.getGuild().modifyNickname(event.getMember(), event.getOldNickname()).queue();
         }
     }
 }

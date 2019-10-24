@@ -1,29 +1,5 @@
 package net.dirtcraft.dirtbot.modules;
 
-import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.conversion.Path;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.vdurmont.emoji.EmojiParser;
-import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.tickets.*;
-import net.dirtcraft.dirtbot.data.Ticket;
-import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
-import net.dirtcraft.dirtbot.internal.configs.IConfigData;
-import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
-import net.dirtcraft.dirtbot.internal.modules.Module;
-import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dirtcraft.dirtbot.utils.tickets.TicketUtils;
-import net.dirtcraft.dirtbot.utils.tickets.TicketsDatabaseHelper;
-import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.core.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.model.ZipParameters;
-
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -33,8 +9,53 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.conversion.Path;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.vdurmont.emoji.EmojiParser;
+
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.commands.tickets.AddMember;
+import net.dirtcraft.dirtbot.commands.tickets.CloseTicket;
+import net.dirtcraft.dirtbot.commands.tickets.CloseTimer;
+import net.dirtcraft.dirtbot.commands.tickets.GetInfo;
+import net.dirtcraft.dirtbot.commands.tickets.LauncherTickets;
+import net.dirtcraft.dirtbot.commands.tickets.PopulateTicket;
+import net.dirtcraft.dirtbot.commands.tickets.RemoveMember;
+import net.dirtcraft.dirtbot.commands.tickets.SetLevel;
+import net.dirtcraft.dirtbot.commands.tickets.SetServer;
+import net.dirtcraft.dirtbot.commands.tickets.SetTicketName;
+import net.dirtcraft.dirtbot.commands.tickets.SetUsername;
+import net.dirtcraft.dirtbot.commands.tickets.SilentClose;
+import net.dirtcraft.dirtbot.data.Ticket;
+import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
+import net.dirtcraft.dirtbot.internal.configs.IConfigData;
+import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
+import net.dirtcraft.dirtbot.internal.modules.Module;
+import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
+import net.dirtcraft.dirtbot.utils.tickets.TicketUtils;
+import net.dirtcraft.dirtbot.utils.tickets.TicketsDatabaseHelper;
+import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.PermissionOverride;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.model.ZipParameters;
 
 @ModuleClass(requiresDatabase = true)
 public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketModule.EmbedUtilsTickets> {
@@ -176,7 +197,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     public void onGuildMessageReactionAdd(GuildMessageReactionAddEvent event) {
         if(event.getUser().isBot()) return;
 
-        event.getChannel().getMessageById(event.getMessageId()).queue((message) -> {
+        event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
             if(!message.getAuthor().isBot()) return;
             // Notification Subscription?
             if(event.getChannel().getId().equals(getConfig().notificationChannelID)) {
@@ -192,7 +213,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
         if(event.getUser().isBot()) return;
 
-        event.getChannel().getMessageById(event.getMessageId()).queue((message) -> {
+        event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
             if(!message.getAuthor().isBot()) return;
 
             // Notification Unsubscription?
@@ -303,7 +324,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         public void updateTicketHeaderMessage(Ticket ticket) {
             TextChannel ticketChannel = DirtBot.getJda().getTextChannelById(ticket.getChannel());
-            ticketChannel.getPinnedMessages().queue((messages) -> {
+            ticketChannel.retrievePinnedMessages().queue((messages) -> {
                 for (Message message : messages) {
                     if (message.getEmbeds().size() == 0) DirtBot.pokeDevs(new IllegalArgumentException("There is no embed! @ " + ticketChannel.getId()));
                     final MessageEmbed embed = message.getEmbeds().get(0);
@@ -359,7 +380,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                             String line = "";
                             line += message.getMember().getEffectiveName();
                             line += " : ";
-                            line += message.getCreationTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
+                            line += message.getTimeCreated().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT));
                             line += "> ";
                             line += message.getContentDisplay();
                             for(MessageEmbed embed : message.getEmbeds()) {
@@ -402,7 +423,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                                 "**3.** Wait patiently! Our staff team is very busy working to provide service to __all__ players.", false);
         TextChannel supportChannel = DirtBot.getJda().getTextChannelById(getConfig().supportChannelID);
         boolean messageFound = false;
-        for(Message message : supportChannel.getPinnedMessages().complete()) {
+        for(Message message : supportChannel.retrievePinnedMessages().complete()) {
             if(message.getEmbeds().size() > 0 && message.getAuthor().isBot() && message.getEmbeds().get(0).getFields().get(0).getName().contains(instructions.getFields().get(0).getName())) {
                 message.editMessage(instructions.build()).complete();
                 messageFound = true;

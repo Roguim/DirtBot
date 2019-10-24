@@ -1,19 +1,21 @@
 package net.dirtcraft.dirtbot.modules;
 
+import java.awt.Color;
+import java.time.Instant;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.core.events.message.react.MessageReactionRemoveEvent;
-import org.apache.commons.lang3.StringUtils;
-
-import java.awt.*;
-import java.time.Instant;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 
 @ModuleClass
 public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServerRoles, ServerRolesModule.EmbedUtilsServerRoles> {
@@ -107,7 +109,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
 
     private void giveRole(MessageReactionAddEvent event) {
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
-                event.getGuild().getController().addRolesToMember(event.getMember(), role).queue());
+                event.getGuild().addRoleToMember(event.getMember(), role).queue());
 
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.GREEN)
@@ -123,7 +125,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
 
     private void removeRole(MessageReactionRemoveEvent event) {
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
-                event.getGuild().getController().removeRolesFromMember(event.getMember(), role).queue());
+                event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
 
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.RED)

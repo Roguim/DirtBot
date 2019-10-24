@@ -1,8 +1,11 @@
 package net.dirtcraft.dirtbot.utils.music;
 
+import java.nio.ByteBuffer;
+
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
-import net.dv8tion.jda.core.audio.AudioSendHandler;
+
+import net.dv8tion.jda.api.audio.AudioSendHandler;
 
 public class AudioPlayerSendHandler implements AudioSendHandler {
 
@@ -21,19 +24,15 @@ public class AudioPlayerSendHandler implements AudioSendHandler {
         return lastFrame != null;
     }
 
-    @Override
-    public byte[] provide20MsAudio() {
-        if (lastFrame == null) lastFrame = audioPlayer.provide();
-
-
-        byte[] data = lastFrame != null ? lastFrame.getData() : null;
-        lastFrame = null;
-
-        return data;
-    }
+	@Override
+	public ByteBuffer provide20MsAudio() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     @Override
     public boolean isOpus() {
         return true;
     }
+
 }

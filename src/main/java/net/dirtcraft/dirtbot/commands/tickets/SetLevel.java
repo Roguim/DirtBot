@@ -1,20 +1,20 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.MessageReaction;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @CommandClass(TicketModule.class)
 public class SetLevel extends CommandTicketStaff {
@@ -47,10 +47,10 @@ public class SetLevel extends CommandTicketStaff {
         getModule().getEmbedUtils().updateTicketHeaderMessage(ticket);
         if(level == Ticket.Level.ADMIN && ticket.getServer(true) != null) {
             // Ping Subscribers
-            DirtBot.getJda().getTextChannelById(getModule().getConfig().notificationChannelID).getMessageById(getModule().getTicketNotificationEmbeds().get(ticket.getServer(false))).queue((message) -> {
+            DirtBot.getJda().getTextChannelById(getModule().getConfig().notificationChannelID).retrieveMessageById(getModule().getTicketNotificationEmbeds().get(ticket.getServer(false))).queue((message) -> {
                 for(MessageReaction reaction : message.getReactions()) {
                     if(reaction.getReactionEmote().getName().equals("\uD83D\uDCEC")) {
-                        reaction.getUsers().queue((users) -> {
+                        reaction.retrieveUsers().queue((users) -> {
                             String pingMessage = "";
                             boolean hasUser = false;
                             for(User user : users) {
