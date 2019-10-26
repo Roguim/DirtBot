@@ -22,9 +22,13 @@ import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.audit.ActionType;
+import net.dv8tion.jda.api.audit.AuditLogEntry;
+import net.dv8tion.jda.api.entities.Guild.Ban;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 
 @ModuleClass
 public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigData, PunishmentModule.PunishmentEmbedUtils> {
@@ -132,6 +136,25 @@ public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigDa
 		 }, 60, 60*1000);
 	}
 	
+	@Override
+	public void onGuildBan(GuildBanEvent event) {
+		event.getGuild().retrieveBan(event.getUser()).queue(ban -> {
+			String reason = ban.getReason();
+			String punished = ban.getUser().getId();
+			
+			event.getGuild().retrieveAuditLogs().queue(logs -> {
+				for(AuditLogEntry log : logs) {
+					if(log.getType() == ActionType.BAN) {
+						if(log.getTargetId().equals(punished)) {
+							String punisher = log.getUser().getId();
+							getEmbedUtils().sendPunishLog(punisher, punished, PunishmentLogType.BAN, null, reason);
+						}
+					}
+				}
+			});
+		});
+	}
+	
 	public class PunishmentEmbedUtils extends EmbedUtils {
         @Override
         public EmbedBuilder getEmptyEmbed() {
@@ -156,7 +179,6 @@ public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigDa
         		"**Punishment Type:** Ban\n" +
         		"**Punisher:** <@" + punisherID + ">\n" +
         		"**Punished Player:** <@" + punishedID + ">\n" +
-        		"**Duration:** " + length + "\n" +
         		"**Reason:** " + reason, false);
         		punishmentLogChannel.sendMessage(banLog.build()).queue();
         		break;
