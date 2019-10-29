@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -14,7 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-@CommandClass()
+@CommandClass
 public class Versions implements ICommand {
 
     private final CommandsModule module;
@@ -33,17 +35,23 @@ public class Versions implements ICommand {
             names.add(server.get(0));
             versions.add(server.get(4));
         }
-
-        MessageEmbed response = module.getEmbedUtils().getEmptyEmbed()
-                .addField("__ModPacks__", String.join("\n", names), true)
-                .addField("__Versions__", String.join("\n", versions), true)
-                .build();
-        event.getTextChannel().sendMessage(response).queue();
+        
+        ArrayList<String> nameVersions = new ArrayList<String>();
+        for(int i = 0; i < names.size(); i++) {
+        	String current;
+        	current = names.get(i);
+        	final int spaces = 20;
+        	current = StringUtils.rightPad(current, (spaces-names.get(i).length())+names.get(i).length());
+        	current += versions.get(i);
+        	nameVersions.add(current);
+        }
+        
+        MessageEmbed versionsEmbed = module.getEmbedUtils().getEmptyEmbed()
+        		.addField("__ModPacks__                                    __Versions__", 
+        				"```" + String.join("\n", nameVersions) + "```", false)
+        		.build();
+        event.getTextChannel().sendMessage(versionsEmbed).queue();
         return true;
-    }
-
-    private int sortType(String server) {
-        return server.toLowerCase().contains("pixel") ? 0 : 1;
     }
 
     @Override
