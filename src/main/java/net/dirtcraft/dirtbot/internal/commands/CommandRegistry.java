@@ -22,6 +22,10 @@ public class CommandRegistry {
     public void registerCommand(ICommand command) {
         commands.add(command);
     }
+    
+    public List<ICommand> getCommands() {
+    	return commands;
+    }
 
     // Call when a message that is potentially a command is sent
     public boolean executeCommand(MessageReceivedEvent event) {

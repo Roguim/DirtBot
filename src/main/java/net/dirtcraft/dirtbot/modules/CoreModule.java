@@ -121,6 +121,10 @@ public class CoreModule extends Module<CoreModule.ConfigDataCore, CoreModule.Emb
             commandRegistry.registerCommand(command);
         }
     }
+    
+    public CommandRegistry getCommandRegistry() {
+    	return commandRegistry;
+    }
 
     public void postInitialize() {
         // Info Channel Header

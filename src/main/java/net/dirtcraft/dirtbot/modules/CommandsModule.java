@@ -10,6 +10,7 @@ import com.electronwill.nightconfig.core.conversion.Path;
 
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.misc.Donate;
+import net.dirtcraft.dirtbot.commands.misc.Help;
 import net.dirtcraft.dirtbot.commands.misc.Launcher;
 import net.dirtcraft.dirtbot.commands.misc.Maps;
 import net.dirtcraft.dirtbot.commands.misc.Ping;
@@ -52,6 +53,7 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
                 new Site(this),
                 new Unstuck(this),
                 new Versions(this),
+                new Help(this),
                 new Vote(this)
         );
     }
