@@ -1,12 +1,5 @@
 package net.dirtcraft.dirtbot;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
 import net.dirtcraft.dirtbot.modules.MiscModule;
@@ -16,6 +9,13 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
+import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import javax.annotation.Nullable;
+import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
+import java.util.List;
 
 // You would rarely ever have to modify this class. New commands, features, etc. all belong in modules.
 public class DirtBot {
@@ -56,10 +56,21 @@ public class DirtBot {
         // Core Module Post-Init
         coreModule.postInitialize();
 
-        // Update verification channel message
-        moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
+        if (getConfig().useDBModules) {
+            // Update verification channel message
+            moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
+        }
         // Initialize player count scheduler
         moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
+
+        exceptionNotifications = new ArrayList<String>() {{
+            add("177618988761743360");
+            add("248056002274918400");
+            add("217768355833053185");
+            if (getJda().getGuilds().contains(getJda().getGuildById("269639757351354368"))) {
+                add("209865813849538560");
+            }
+        }};
 
         System.out.println("DirtBot is now initialized");
         jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, "on DIRTCRAFT.GG", "https://www.twitch.tv/dirtcraft/"));
@@ -76,16 +87,14 @@ public class DirtBot {
 
     public static ModuleRegistry getModuleRegistry() { return moduleRegistry; }
 
-    private static ArrayList<String> exceptionNotifications = new ArrayList<String>() {{
-        add("177618988761743360");
-        add("209865813849538560");
-        add("248056002274918400");
-        add("217768355833053185");
-    }};
+    private static ArrayList<String> exceptionNotifications;
 
     public static void pokeDevs(Exception e) {
         for (String notification : exceptionNotifications) {
-            DirtBot.getJda().getUserById(notification).openPrivateChannel().queue((privateChannel) -> {
+            @Nullable
+            User user = DirtBot.getJda().getUserById(notification);
+            if (user == null) continue;
+            user.openPrivateChannel().queue((privateChannel) -> {
                 String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
                 List<String> messageExceptions = new ArrayList<>();
                 String workingException = "";

@@ -1,7 +1,5 @@
 package net.dirtcraft.dirtbot.commands.staff;
 
-import java.util.List;
-
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
@@ -9,6 +7,9 @@ import net.dirtcraft.dirtbot.modules.StaffCordModule;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.Arrays;
+import java.util.List;
 
 @CommandClass
 public class UpdateTicketInfo implements ICommand {
@@ -38,7 +39,7 @@ public class UpdateTicketInfo implements ICommand {
 
 	@Override
 	public List<String> aliases() {
-		return List.of("update", "updoot", "reload", "updateyoudumbbot");
+		return Arrays.asList("update", "updoot", "reload", "updateyoudumbbot");
 	}
 
 	@Override

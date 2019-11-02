@@ -1,17 +1,7 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.staff.UpdateTicketInfo;
 import net.dirtcraft.dirtbot.data.OrganizedMessage;
@@ -27,7 +17,16 @@ import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-@ModuleClass
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+@ModuleClass (requiresDatabase = true, experimental = true)
 public class StaffCordModule  extends Module<StaffCordModule.StaffCordConfigData, StaffCordModule.StaffCordEmbedUtils> {
 	
 	@Override

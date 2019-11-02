@@ -1,14 +1,13 @@
 package net.dirtcraft.dirtbot.internal.modules;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.reflections.Reflections;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.modules.CoreModule;
 import net.dv8tion.jda.api.JDA;
+import org.reflections.Reflections;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class ModuleRegistry {
 
@@ -58,7 +57,7 @@ public class ModuleRegistry {
         return null;
     }
 
-    public boolean runningFromIde() {
+    private boolean runningFromIde() {
         String classPath = System.getProperty("java.class.path");
         return classPath.contains("idea_rt.jar");
     }

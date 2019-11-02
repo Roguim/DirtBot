@@ -1,17 +1,19 @@
 package net.dirtcraft.dirtbot.commands.misc;
 
-import java.util.List;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
 import net.dirtcraft.dirtbot.modules.CommandsModule;
-import net.dirtcraft.dirtbot.modules.StaffCordModule;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandClass
 public class Help implements ICommand {
@@ -24,21 +26,16 @@ public class Help implements ICommand {
 
 	@Override
 	public boolean execute(MessageReceivedEvent event, List<String> args) {
-		for(ICommand command : DirtBot.getCoreModule().getCommandRegistry().getCommands()) {
-			EmbedBuilder embed = module.getEmbedUtils().getEmptyEmbed();
-			String argsInfo = "None";
-			if(command.args() != null) {
-				argsInfo = "";
-		        for(CommandArgument arg : command.args()) {
-		            argsInfo += "**" + arg.getName() + "**: " + arg.getDescription() + "\n";
-		        }
-			}
-			embed.addField("__!" + command.aliases().get(0) + "__", 
-					"**Aliases:** " + String.join(", ", command.aliases() + "\n" +
-			        "**Permission:** " + String.valueOf(command.hasPermission(event.getMember()))) + "\n" +
-					"**Arguments:** " + argsInfo, false);
-			event.getChannel().sendMessage(embed.build()).queue();
-		}
+		List<String> commands = DirtBot.getCoreModule().getCommandRegistry().getCommands()
+				.stream()
+				.filter(command -> command.hasPermission(event.getMember()))
+				.map(command -> "**!" + command.aliases().get(0) + "**")
+				.sorted(Comparator.comparing(command -> command))
+				.collect(Collectors.toList());
+
+		EmbedBuilder embed = module.getEmbedUtils().getEmptyEmbed();
+		embed.setDescription(String.join("\n", commands));
+		event.getChannel().sendMessage(embed.build()).queue();
 		return true;
 	}
 
@@ -49,13 +46,12 @@ public class Help implements ICommand {
 
 	@Override
 	public boolean validChannel(TextChannel channel) {
-		if(channel.getGuild().getId().equals("568930779191574568")) return true;
-		return false;
+		return true;
 	}
 
 	@Override
 	public List<String> aliases() {
-		return List.of("help");
+		return Collections.singletonList("help");
 	}
 
 	@Override

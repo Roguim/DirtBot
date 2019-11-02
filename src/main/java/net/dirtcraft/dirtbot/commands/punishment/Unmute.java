@@ -1,8 +1,5 @@
 package net.dirtcraft.dirtbot.commands.punishment;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -12,6 +9,10 @@ import net.dirtcraft.dirtbot.modules.PunishmentModule.PunishmentLogType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @CommandClass
 public class Unmute implements ICommand {
@@ -66,12 +67,12 @@ public class Unmute implements ICommand {
 
 	@Override
 	public List<String> aliases() {
-		return List.of("unmute");
+		return Collections.singletonList("unmute");
 	}
 
 	@Override
 	public List<CommandArgument> args() {
-		return List.of(new CommandArgument("Mention User", "Mention the user to unmute", 1, 0));
+		return Collections.singletonList(new CommandArgument("Mention User", "Mention the user to unmute", 1, 0));
 	}
 
 }

@@ -1,14 +1,5 @@
 package net.dirtcraft.dirtbot.commands.punishment;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang3.time.DateUtils;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -19,6 +10,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.lang3.time.DateUtils;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @CommandClass
 public class Mute implements ICommand {
@@ -65,7 +66,7 @@ public class Mute implements ICommand {
 		for(int i = 2; i < args.size(); i++) {
 			reason += args.get(i) + " ";
 		}
-		reason = reason.stripTrailing();
+		reason = reason.trim();
 		
 		//Try to add the muted role
 		if(event.getGuild().getMember(punished).getRoles().contains(event.getJDA().getRoleById(module.getConfig().mutedRoleID))) {
@@ -162,8 +163,7 @@ public class Mute implements ICommand {
 
 	@Override
 	public boolean hasPermission(Member member) {
-		if(member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().adminRoleID))) return true;
-		return false;
+		return member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().adminRoleID));
 	}
 
 	@Override
@@ -173,12 +173,12 @@ public class Mute implements ICommand {
 
 	@Override
 	public List<String> aliases() {
-		return List.of("mute");
+		return Collections.singletonList("mute");
 	}
 
 	@Override
 	public List<CommandArgument> args() {
-		return List.of(new CommandArgument("Mention User", "Mention the user you want to mute.", 1, 0), 
+		return Arrays.asList(new CommandArgument("Mention User", "Mention the user you want to mute.", 1, 0),
 				       new CommandArgument("Length", "How long you want to mute for. Ex: 1s, 1m, 1d, 1w, 1mo, 1y.", 1, 0),
 				       new CommandArgument("Reason", "The reason for muting the user.", 1, 0));
 	}
