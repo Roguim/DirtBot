@@ -107,7 +107,26 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         );
 
         // Establish Tasks
-        if(getConfig().autocloseInterval > 0) {
+        Timer autoClose = new Timer();
+        autoClose.schedule(new TimerTask() {
+        	@Override
+        	public void run() {
+        		HashMap<Integer, String> timedCloses = getDatabaseHelper().getAllTimedCloses();
+        		for(int ticketID : timedCloses.keySet()) {
+        			 LocalDateTime ticketCloseTime = LocalDateTime.parse(timedCloses.get(ticketID));
+                     LocalDateTime now = LocalDateTime.now();
+                     if (ChronoUnit.SECONDS.between(now, ticketCloseTime) <= 60) {
+                         getDatabaseHelper().getTicket(ticketID).ifPresent(ticket -> {
+                             getEmbedUtils().sendLog("Timer Closed", "The user failed to respond to this ticket within 24 hours of the timer being started, so the ticket was automatically closed.", ticket, DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMemberById(DirtBot.getJda().getSelfUser().getId()));
+                             getTicketUtils().closeTicket(ticket, "No responses were received for 24 hours after starting a timer, and thus the ticket has been closed automatically. Please submit a new ticket if you need further assistance.", true);
+                         });
+                     }
+        		}
+        	}
+        }, 60, 60*1000);
+        
+        //DEPRECATED BY KARATE
+        /**if(getConfig().autocloseInterval > 0) {
             TimerTask autoClose = new TimerTask() {
                 @Override
                 public void run() {
@@ -131,7 +150,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                     .addField("__Initialization Event | Timer Close__",
                             "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
             getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
-        }
+        }**/
         if (getConfig().gamesyncInterval > 0) {
 
             TimerTask gameSync = new TimerTask() {

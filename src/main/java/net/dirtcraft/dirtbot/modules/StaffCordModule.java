@@ -30,9 +30,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 @ModuleClass
 public class StaffCordModule  extends Module<StaffCordModule.StaffCordConfigData, StaffCordModule.StaffCordEmbedUtils> {
 	
-	//public final String staffCordGuildID = "568566591722094612"; //CHANGE WHEN DONE TESTING
-	//public final String ticketInfoChannelID = "638632090996572167"; //CHANGE WHEN DONE TESTING
-
 	@Override
 	public void initialize() {
 		setEmbedUtils(new StaffCordModule.StaffCordEmbedUtils());
