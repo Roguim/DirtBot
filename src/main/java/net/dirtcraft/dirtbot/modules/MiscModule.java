@@ -1,16 +1,9 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.time.Instant;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import com.electronwill.nightconfig.core.ConfigSpec;
-import com.electronwill.nightconfig.core.conversion.Path;
-
 import br.com.azalim.mcserverping.MCPing;
 import br.com.azalim.mcserverping.MCPingResponse;
+import com.electronwill.nightconfig.core.ConfigSpec;
+import com.electronwill.nightconfig.core.conversion.Path;
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
@@ -23,17 +16,24 @@ import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
 
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.util.Timer;
+import java.util.TimerTask;
+
 @ModuleClass
 public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.EmbedUtilsMisc> {
 
     private final NumberFormat numberFormat = NumberFormat.getInstance();
-    private final Guild dirtcraftGuild = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
+    private Guild dirtcraftGuild;
 
     @Override
     public void initialize() {
         // Initialize Embed utils
         setEmbedUtils(new MiscModule.EmbedUtilsMisc());
         numberFormat.setGroupingUsed(true);
+        dirtcraftGuild = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
     }
 
     @Override
@@ -92,8 +92,11 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
 
     private void setMemberCount() {
         VoiceChannel voiceChannel = DirtBot.getJda().getVoiceChannelById(getConfig().memberCountChannelID);
-        String size = numberFormat.format(dirtcraftGuild.getMembers().size());
-        voiceChannel.getManager().setName("Member Count: " + size).queue();
+        int size = dirtcraftGuild.getMembers().size();
+        if (Integer.parseInt(voiceChannel.getName().replace("Member Count: ", "").replace(",", "")) ==
+                dirtcraftGuild.getMembers().size()) return;
+        String sizeString = numberFormat.format(size);
+        voiceChannel.getManager().setName("Member Count: " + sizeString).queue();
     }
 
     public void initPlayerCountScheduler() {
@@ -102,17 +105,20 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
             @Override
             public void run() {
                 VoiceChannel voiceChannel = DirtBot.getJda().getVoiceChannelById(getConfig().playerCountChannelID);
-                voiceChannel.getManager().setName("Player Count: " + getPlayerCount()).queue();
+                int currentSize = Integer.parseInt(voiceChannel.getName().replace("Player Count: ", ""));
+                int newSize = getPlayerCount();
+                if (currentSize == newSize) return;
+                if (newSize != -1) voiceChannel.getManager().setName("Player Count: " + getPlayerCount()).queue();
             }
         }, 0, 2000);
     }
 
-    private String getPlayerCount() {
+    private int getPlayerCount() {
         try {
             MCPingResponse reply = MCPing.getPing(getConfig().serverIP);
-            return String.valueOf(reply.getPlayers().getOnline());
+            return reply.getPlayers().getOnline();
         } catch (IOException exception) {
-            return "N/A";
+            return -1;
         }
     }
 

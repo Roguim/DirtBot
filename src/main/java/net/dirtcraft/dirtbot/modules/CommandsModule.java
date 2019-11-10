@@ -37,6 +37,7 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
                 new Review(this),
                 new Servers(this),
                 new Site(this),
+                new Stop(this),
                 new Update(this),
                 new Unstuck(this),
                 new Versions(this),
