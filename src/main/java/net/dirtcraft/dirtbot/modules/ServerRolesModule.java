@@ -76,6 +76,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
                 case "direwolf20":
                 case "omnifactory":
                 case "pixelmon":
+                case "roguelike":
                     giveRole(event);
                     break;
             }
@@ -101,6 +102,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
                 case "direwolf20":
                 case "omnifactory":
                 case "pixelmon":
+                case "roguelike":
                     removeRole(event);
                     break;
             }
