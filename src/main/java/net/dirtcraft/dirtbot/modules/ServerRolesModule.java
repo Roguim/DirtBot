@@ -1,13 +1,7 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.awt.Color;
-import java.time.Instant;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
@@ -16,6 +10,10 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
+import org.apache.commons.lang3.StringUtils;
+
+import java.awt.*;
+import java.time.Instant;
 
 @ModuleClass
 public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServerRoles, ServerRolesModule.EmbedUtilsServerRoles> {
@@ -59,52 +57,12 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        if (event.getMessageId().equals("538574783319638026")) {
-            switch (event.getReactionEmote().getName().toLowerCase()) {
-                case "stoneblock":
-                case "projectozone":
-                case "continuum":
-                case "glacialawakening":
-                case "infinityevolved":
-                case "skyfactory":
-                case "revelation":
-                case "rlcraft":
-                case "interactions":
-                case "skyadventures":
-                case "ultimatereloaded":
-                case "skyodyssey":
-                case "direwolf20":
-                case "omnifactory":
-                case "pixelmon":
-                    giveRole(event);
-                    break;
-            }
-        }
+        if (event.getMessageId().equals("538574783319638026")) giveRole(event);
     }
 
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent event) {
-        if (event.getMessageId().equals("538574783319638026")) {
-            switch (event.getReactionEmote().getName().toLowerCase()) {
-                case "stoneblock":
-                case "projectozone":
-                case "continuum":
-                case "glacialawakening":
-                case "infinityevolved":
-                case "skyfactory":
-                case "revelation":
-                case "rlcraft":
-                case "interactions":
-                case "skyadventures":
-                case "ultimatereloaded":
-                case "skyodyssey":
-                case "direwolf20":
-                case "omnifactory":
-                case "pixelmon":
-                    removeRole(event);
-                    break;
-            }
-        }
+        if (event.getMessageId().equals("538574783319638026")) removeRole(event);
     }
 
     private void giveRole(MessageReactionAddEvent event) {
