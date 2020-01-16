@@ -66,7 +66,6 @@ public class DirtBot {
         exceptionNotifications = new ArrayList<String>() {{
             add("177618988761743360");
             add("248056002274918400");
-            add("217768355833053185");
             if (getJda().getGuilds().contains(getJda().getGuildById("269639757351354368"))) {
                 add("209865813849538560");
             }
