@@ -1,9 +1,5 @@
 package net.dirtcraft.dirtbot.commands.misc;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -13,6 +9,10 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @CommandClass()
 public class Servers implements ICommand {
@@ -36,7 +36,7 @@ public class Servers implements ICommand {
 
         final ArrayList<String> pixelIPs = new ArrayList<String>() {{
             add("**RED**.PIXELMON.GG");
-            add("Coming Soon");
+            add("**GLOW**.PIXELMON.GG");
             add("Coming Soon");
         }};
 
