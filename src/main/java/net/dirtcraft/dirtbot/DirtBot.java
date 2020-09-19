@@ -2,7 +2,6 @@ package net.dirtcraft.dirtbot;
 
 import net.dirtcraft.dirtbot.internal.modules.ModuleRegistry;
 import net.dirtcraft.dirtbot.modules.CoreModule;
-import net.dirtcraft.dirtbot.modules.MiscModule;
 import net.dirtcraft.dirtbot.modules.VerificationModule;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -61,7 +60,7 @@ public class DirtBot {
             moduleRegistry.getModule(VerificationModule.class).updateChannelMessage();
         }
         // Initialize player count scheduler
-        moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
+        // moduleRegistry.getModule(MiscModule.class).initPlayerCountScheduler();
 
         exceptionNotifications = new ArrayList<String>() {{
             add("177618988761743360");

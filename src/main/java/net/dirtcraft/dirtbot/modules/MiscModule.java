@@ -110,7 +110,7 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
                 if (currentSize == newSize) return;
                 if (newSize != -1) voiceChannel.getManager().setName("Player Count: " + getPlayerCount()).queue();
             }
-        }, 0, 2000);
+        }, 0, 60000);
     }
 
     private int getPlayerCount() {
