@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.vdurmont.emoji.EmojiParser;
 
@@ -35,7 +35,7 @@ public class CloseTicket extends CommandTicket {
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
                 .addField("__Close Ticket__", "Are you sure you want to close this ticket?\n" +
                         "Please confirm or cancel this command by selecting one of the options below.", false)
-                .addField("__Reason__", "```" + WordUtils.capitalizeFully(reason) + "```", false);
+                .addField("__Reason__", "```" + StringUtils.capitalize(reason) + "```", false);
 
         MessageEmbed reviewEmbed = getModule().getEmbedUtils().getReviewEmbed();
 

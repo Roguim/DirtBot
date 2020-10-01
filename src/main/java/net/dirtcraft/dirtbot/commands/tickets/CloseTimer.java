@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.vdurmont.emoji.EmojiParser;
 
@@ -34,7 +34,7 @@ public class CloseTimer extends CommandTicketStaff {
                 .addField("__Ticket Close Timer Set__", "This ticket will be automatically closed in **24 hours**\n" +
                         "To **close now**, please select \u2705" + "\n" +
                         "To **cancel closure**, please select \u274C", false)
-                .addField("__Reason__", "```" + WordUtils.capitalizeFully(reason) + "```", false);
+                .addField("__Reason__", "```" + StringUtils.capitalize(reason) + "```", false);
 
         MessageEmbed reviewEmbed = getModule().getEmbedUtils().getReviewEmbed();
 
