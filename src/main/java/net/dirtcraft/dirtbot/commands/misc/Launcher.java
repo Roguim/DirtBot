@@ -1,8 +1,5 @@
 package net.dirtcraft.dirtbot.commands.misc;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
 import net.dirtcraft.dirtbot.internal.commands.ICommand;
@@ -11,6 +8,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.Arrays;
+import java.util.List;
 
 @CommandClass()
 public class Launcher implements ICommand {
@@ -31,7 +31,7 @@ public class Launcher implements ICommand {
                 .addField("__Windows Installer__",
                         "[**64-Bit**](https://dirtcraft.net/launcher/download/Dirt-Launcher_x64.msi)\n" +
                         "[**32-Bit**](https://dirtcraft.net/launcher/download/Dirt-Launcher_x86.msi)", false)
-                .addField("__Universal Installer__", "[**All Operating Systems**](https://dirtcraft.net/launcher/download/Dirt-Launcher.jar)",
+                .addField("__Universal Installer__", "[**All Operating Systems**](https://dirtcraft.net/launcher/Dirt-Launcher.jar)",
                         false).build();
         event.getTextChannel().sendMessage(response).queue();
         return true;
