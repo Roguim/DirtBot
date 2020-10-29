@@ -1,10 +1,10 @@
 package net.dirtcraft.dirtbot.internal.commands;
 
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.List;
 
 public interface ICommand {
 
