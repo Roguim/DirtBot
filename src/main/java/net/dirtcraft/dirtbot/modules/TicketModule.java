@@ -521,6 +521,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         String message = "Awaiting ";
         for (PermissionOverride po : event.getTextChannel().getMemberPermissionOverrides()) {
+            if (po.getMember() == null) continue;
             if (!po.getMember().getUser().isBot()) {
                 message += "<@" + po.getMember().getUser().getId() + ">, ";
             }
@@ -528,7 +529,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         message = message.substring(0, message.length() - 2);
         message += "'s Response...";
 
-        event.getTextChannel().getManager().setTopic(message).queue();
+        ticketChannel.getManager().setTopic(message).queue();
     }
 
     private void ticketInternalMessageReceived(MessageReceivedEvent event) {
@@ -536,6 +537,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         if(event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
             String message = "Awaiting ";
             for(PermissionOverride po : event.getTextChannel().getMemberPermissionOverrides()) {
+                if (po.getMember() == null) continue;
                 if(!po.getMember().getUser().isBot()) {
                     message += "<@" + po.getMember().getUser().getId() + ">, ";
                 }

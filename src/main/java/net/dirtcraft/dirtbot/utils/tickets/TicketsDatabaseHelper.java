@@ -271,7 +271,7 @@ public class TicketsDatabaseHelper {
 
     public void setTicketChannel(Ticket ticket) {
         try (Connection con = getDatabaseConnection();
-             PreparedStatement statement = con.prepareStatement("UPDATE tickets SET channel ? WHERE id = ?")) {
+             PreparedStatement statement = con.prepareStatement("UPDATE tickets SET channel = ? WHERE id = ?")) {
             statement.setString(1, ticket.getChannel());
             statement.setInt(2, ticket.getId());
 

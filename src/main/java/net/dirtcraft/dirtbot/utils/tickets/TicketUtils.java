@@ -98,15 +98,17 @@ public class TicketUtils {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
             }
         }
-        ticketChannel.delete().complete();
-        ticket.setOpen(false);
-        ticket.setChannel(null);
-        module.getDatabaseHelper().closeTicket(ticket);
+        ticketChannel.delete().queue(success -> {
+            ticket.setOpen(false);
+            ticket.setChannel(null);
+            module.getDatabaseHelper().closeTicket(ticket);
+        });
     }
 
     public List<Member> getTicketMembers(Ticket ticket) {
         ArrayList<Member> members = new ArrayList<>();
         for(PermissionOverride po : DirtBot.getJda().getTextChannelById(ticket.getChannel()).getMemberPermissionOverrides()) {
+            if (po.getMember() == null) continue;
             if(!po.getMember().getUser().isBot()) members.add(po.getMember());
         }
         return members;
