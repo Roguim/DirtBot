@@ -30,7 +30,7 @@ public class Ticket {
     public boolean getOpen() { return open; }
     public String getMessage() { return message; }
     public String getUsername(boolean nullable) {
-        return nullable ? username : (username != null ? username : "");
+        return nullable ? username.replace("N/A", null) : (username != null ? username : "");
     }
     public String getServer(boolean nullable) {
         return nullable ? server : (server != null ? server : "");
