@@ -1,41 +1,11 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.vdurmont.emoji.EmojiParser;
-
 import net.dirtcraft.dirtbot.DirtBot;
-import net.dirtcraft.dirtbot.commands.tickets.AddMember;
-import net.dirtcraft.dirtbot.commands.tickets.CloseTicket;
-import net.dirtcraft.dirtbot.commands.tickets.CloseTimer;
-import net.dirtcraft.dirtbot.commands.tickets.GetInfo;
-import net.dirtcraft.dirtbot.commands.tickets.LauncherTickets;
-import net.dirtcraft.dirtbot.commands.tickets.PopulateTicket;
-import net.dirtcraft.dirtbot.commands.tickets.RemoveMember;
-import net.dirtcraft.dirtbot.commands.tickets.SetLevel;
-import net.dirtcraft.dirtbot.commands.tickets.SetServer;
-import net.dirtcraft.dirtbot.commands.tickets.SetTicketName;
-import net.dirtcraft.dirtbot.commands.tickets.SetUsername;
-import net.dirtcraft.dirtbot.commands.tickets.SilentClose;
+import net.dirtcraft.dirtbot.commands.tickets.*;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
@@ -46,16 +16,24 @@ import net.dirtcraft.dirtbot.utils.tickets.TicketUtils;
 import net.dirtcraft.dirtbot.utils.tickets.TicketsDatabaseHelper;
 import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.PermissionOverride;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @ModuleClass(requiresDatabase = true)
 public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketModule.EmbedUtilsTickets> {
@@ -126,7 +104,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         }, 60, 60*1000);
         
         //DEPRECATED BY KARATE
-        /**if(getConfig().autocloseInterval > 0) {
+        /*if(getConfig().autocloseInterval > 0) {
             TimerTask autoClose = new TimerTask() {
                 @Override
                 public void run() {
@@ -150,9 +128,9 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                     .addField("__Initialization Event | Timer Close__",
                             "Timer Close has been **disabled** due to autoclose interval being set to -1.\n To enable Timer Close, configure autoclose interval to an integer greater than 0 and restart the bot.", false);
             getEmbedUtils().sendLog(autoCloseNoInitEmbed.build());
-        }**/
+        }*/
         if (getConfig().gamesyncInterval > 0) {
-
+            /*
             TimerTask gameSync = new TimerTask() {
                 @Override
                 public void run() {
@@ -165,6 +143,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             };
             Timer gameSyncTimer = new Timer();
             gameSyncTimer.scheduleAtFixedRate(gameSync, 0, getConfig().gamesyncInterval * 1000);
+
+             */
         } else {
             EmbedBuilder gameSyncNoInitEmbed = getEmbedUtils().getEmptyEmbed()
                     .addField("__Initialization Event | Game Sync__", "Game Sync has been **disabled** due to gamesync interval being set to -1.\n To enable Game Sync, configure gamesync interval to an integer greater than 0 and restart the bot.", false);
@@ -504,9 +484,11 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId()) && !getVerificationDB().isVerified(event.getMember().getUser().getId())) {
             EmbedBuilder response;
             String verificationChannelID = getVerification().getConfig().verificationChannelID;
-            response = getEmbedUtils().getErrorEmbed(databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) != null ?
-                    "You already have ticket <#" + databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId()) + "> open!\nVerify in <#" + verificationChannelID + "> to create more!" :
-                    "You already have a ticket open!\nVerify in <#" + verificationChannelID + "> to create more!");
+            Optional<String> optionalChannelId = databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId());
+            response = getEmbedUtils().getErrorEmbed(
+                    (optionalChannelId.map(s -> "You already have ticket <#" + s + "> open!")
+                            .orElse("You already have a ticket open!")) +
+                            "Verify in <#" + verificationChannelID + "> to create more!");
 
             event.getChannel().sendMessage(response.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
 
@@ -526,7 +508,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         }
 
         Optional<String> optionalUUID = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
-        String username = optionalUUID.map(s -> getVerificationDB().getUsernamefromUUID(s).orElse("N/A")).orElse("N/A");
+        String username = optionalUUID.map(s -> getVerificationDB().getUsernameFromUUID(s).orElse("N/A")).orElse("N/A");
 
         String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
         TextChannel ticketChannel = ticketUtils.createTicket(

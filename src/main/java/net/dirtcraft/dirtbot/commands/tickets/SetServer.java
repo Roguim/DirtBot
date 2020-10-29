@@ -1,9 +1,5 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -11,6 +7,10 @@ import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @CommandClass(TicketModule.class)
 public class SetServer extends CommandTicketStaff {
@@ -33,7 +33,7 @@ public class SetServer extends CommandTicketStaff {
                 getModule().getEmbedUtils().sendResponse(getModule().getEmbedUtils().getEmptyEmbed().addField("__Ticket Server Set__", eventInfo, false).build(), event.getTextChannel());
                 getModule().getEmbedUtils().sendLog("Server Set", eventInfo, ticket, event.getMember());
                 getModule().getTicketUtils().setTicketServer(ticket, args.get(0).toLowerCase());
-                getModule().getDatabaseHelper().modifyTicket(ticket);
+                getModule().getDatabaseHelper().setTicketServer(ticket);
                 getModule().getEmbedUtils().updateTicketHeaderMessage(ticket);
                 String pingMessage = "";
                 for (User user : getModule().getTicketUtils().getNotificationSubscribers(ticket, getModule())) {

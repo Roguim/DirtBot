@@ -1,23 +1,15 @@
 package net.dirtcraft.dirtbot.utils.tickets;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.PermissionOverride;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public class TicketUtils {
 
@@ -66,26 +58,7 @@ public class TicketUtils {
                 .setTopic("**Awaiting <@&" + DirtBot.getConfig().staffRoleID + ">'s Response...**")
                 .complete();
         ticket.setChannel(ticketChannel.getId());
-        module.getDatabaseHelper().modifyTicket(ticket);
-        ticketChannel.sendMessage(module.getEmbedUtils().getTicketHeader(ticket)).queue((message) -> message.pin().queue());
-        module.getEmbedUtils().sendLog("Created", ticket.getMessage(), ticket, member);
-        return ticketChannel;
-    }
-
-    @Nullable
-    public TextChannel createTicket(Ticket ticket, String discordID) {
-        Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
-        Member member = server.getMemberById(discordID);
-        if (member == null) return null;
-        TextChannel ticketChannel = (TextChannel) server.createTextChannel(Integer.toString(ticket.getId()))
-                .setParent(server.getCategoryById(module.getConfig().supportCategoryID))
-                .addPermissionOverride(member, EnumSet.of(Permission.MESSAGE_READ), null)
-                .addPermissionOverride(server.getRoleById(DirtBot.getConfig().staffRoleID), EnumSet.of(Permission.MESSAGE_READ), null)
-                .addPermissionOverride(server.getRoleById(server.getId()), null, EnumSet.of(Permission.MESSAGE_READ))
-                .setTopic("**Awaiting <@&" + DirtBot.getConfig().staffRoleID + ">'s Response...**")
-                .complete();
-        ticket.setChannel(ticketChannel.getId());
-        module.getDatabaseHelper().modifyTicket(ticket);
+        module.getDatabaseHelper().setTicketChannel(ticket);
         ticketChannel.sendMessage(module.getEmbedUtils().getTicketHeader(ticket)).queue((message) -> message.pin().queue());
         module.getEmbedUtils().sendLog("Created", ticket.getMessage(), ticket, member);
         return ticketChannel;
@@ -98,7 +71,7 @@ public class TicketUtils {
         if (ticket.getLevel() == level) return ticket;
 
         ticket.setLevel(level);
-        module.getDatabaseHelper().modifyTicket(ticket);
+        module.getDatabaseHelper().setTicketLevel(ticket);
         updateCategory(ticket);
         return ticket;
     }
@@ -125,10 +98,10 @@ public class TicketUtils {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
             }
         }
+        ticketChannel.delete().complete();
         ticket.setOpen(false);
         ticket.setChannel(null);
-        module.getDatabaseHelper().modifyTicket(ticket);
-        ticketChannel.delete().queue();
+        module.getDatabaseHelper().closeTicket(ticket);
     }
 
     public List<Member> getTicketMembers(Ticket ticket) {

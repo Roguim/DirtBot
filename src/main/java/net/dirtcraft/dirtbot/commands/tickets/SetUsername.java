@@ -1,10 +1,5 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
 import net.dirtcraft.dirtbot.internal.commands.CommandClass;
@@ -12,6 +7,11 @@ import net.dirtcraft.dirtbot.internal.commands.CommandTicketStaff;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @CommandClass(TicketModule.class)
 public class SetUsername extends CommandTicketStaff {
@@ -29,7 +29,7 @@ public class SetUsername extends CommandTicketStaff {
         EmbedBuilder responseEmbed = getModule().getEmbedUtils().getEmptyEmbed()
                 .addField("__Ticket Username Set__", eventInfo, false);
         ticket.setUsername(args.get(0));
-        getModule().getDatabaseHelper().modifyTicket(ticket);
+        getModule().getDatabaseHelper().setTicketUsername(ticket);
         getModule().getEmbedUtils().sendResponse(responseEmbed.build(), event.getTextChannel());
         getModule().getEmbedUtils().sendLog("Username Set", eventInfo, ticket, event.getMember());
         getModule().getEmbedUtils().updateTicketHeaderMessage(ticket);

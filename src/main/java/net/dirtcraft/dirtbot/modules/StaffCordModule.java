@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @ModuleClass (requiresDatabase = true, experimental = true)
-public class StaffCordModule  extends Module<StaffCordModule.StaffCordConfigData, StaffCordModule.StaffCordEmbedUtils> {
+public class StaffCordModule extends Module<StaffCordModule.StaffCordConfigData, StaffCordModule.StaffCordEmbedUtils> {
 	
 	@Override
 	public void initialize() {

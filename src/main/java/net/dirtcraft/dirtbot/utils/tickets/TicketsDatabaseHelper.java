@@ -4,7 +4,6 @@ import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
 
-import javax.annotation.Nullable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class TicketsDatabaseHelper {
             statement.setString(3, ticket.getDiscordID(true));
 
             // Create Ticket
-            statement.execute();
+            statement.executeUpdate();
             
             // Get latest ticket
             try (
@@ -74,7 +73,7 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE id=?")) {
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM tickets WHERE id = ?")) {
             statement.setInt(1, id);
 
             // Execute Query
@@ -184,32 +183,41 @@ public class TicketsDatabaseHelper {
      */
 
     public boolean hasOpenTicket(String discordID) {
-        boolean hasOpenTicket;
         try (
             Connection connection = getDatabaseConnection();
-            PreparedStatement ps = connection.prepareStatement("SELECT open FROM tickets WHERE discordid = ? ORDER BY id DESC")) {
+            PreparedStatement ps = connection.prepareStatement("SELECT open FROM tickets WHERE discordid = ? AND open = 1")) {
             ps.setString(1, discordID);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) {
-                hasOpenTicket = false;
-            } else {
-                hasOpenTicket = false;
-                while (rs.next()) {
-                    if (rs.getBoolean("open")) hasOpenTicket = true;
-                }
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
             }
-
-            rs.close();
 
         } catch (SQLException exception) {
             exception.printStackTrace();
             DirtBot.pokeDevs(exception);
-            hasOpenTicket = false;
         }
+        return false;
+    }
 
-        return hasOpenTicket;
+    /**
+     * Updates a ticket in the database with information to delete the ticket
+     *
+     * @param ticket The ticket that needs to be deleted
+     */
+
+    public void closeTicket(Ticket ticket) {
+        try (Connection con = getDatabaseConnection();
+             PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open = ?, channel = ? WHERE id = ?")) {
+            statement.setBoolean(1, ticket.getOpen());
+            statement.setString(2, null);
+            statement.setInt(3, ticket.getId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
     }
 
     /**
@@ -222,7 +230,8 @@ public class TicketsDatabaseHelper {
             // Establish Database Connection
             Connection con = getDatabaseConnection();
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("UPDATE tickets SET open=?, username=?, server=?, channel=?, level=?, discordid=? WHERE id=?")) {
+            PreparedStatement statement = con.prepareStatement(
+                    "UPDATE tickets SET open = ?, username = ?, server = ?, channel = ?, level = ?, discordid = ? WHERE id = ?")) {
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getUsername(true));
             statement.setString(3, ticket.getServer(true));
@@ -246,39 +255,78 @@ public class TicketsDatabaseHelper {
         }
     }
 
-    /**
-     * Updates a ticket in the database.
-     *
-     * @return The ticket with updated data
-     */
+    public void setTicketLevel(Ticket ticket) {
+        try (Connection con = getDatabaseConnection();
+             PreparedStatement statement = con.prepareStatement("UPDATE tickets SET level = ? WHERE id = ?")) {
+            statement.setString(1, ticket.getLevel().toString().toLowerCase());
+            statement.setInt(2, ticket.getId());
 
-    @Nullable
-    public String getLastTicketChannelID(String discordID) {
+            statement.executeUpdate();
 
-        String channelID;
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
+    }
 
+    public void setTicketChannel(Ticket ticket) {
+        try (Connection con = getDatabaseConnection();
+             PreparedStatement statement = con.prepareStatement("UPDATE tickets SET channel ? WHERE id = ?")) {
+            statement.setString(1, ticket.getChannel());
+            statement.setInt(2, ticket.getId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
+    }
+
+    public void setTicketUsername(Ticket ticket) {
+        try (Connection connection = getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE tickets set username = ? WHERE id = ?")) {
+            statement.setString(1, ticket.getUsername(true));
+            statement.setInt(2, ticket.getId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
+    }
+
+    public void setTicketServer(Ticket ticket) {
+        try (Connection connection = getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement("UPDATE tickets set server = ? WHERE id = ?")) {
+            statement.setString(1, ticket.getServer(true));
+            statement.setInt(2, ticket.getId());
+
+            statement.executeUpdate();
+
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+            DirtBot.pokeDevs(exception);
+        }
+    }
+
+    public Optional<String> getLastTicketChannelID(String discordID) {
         try (
             Connection connection = getDatabaseConnection();
             PreparedStatement ps = connection.prepareStatement("SELECT channel FROM tickets WHERE discordid = ? ORDER BY id DESC")) {
             ps.setString(1, discordID);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) {
-                channelID = null;
-            } else {
-                channelID = rs.getString("channel");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return Optional.ofNullable(rs.getString("channel"));
             }
-
-            rs.close();
 
         } catch (SQLException exception) {
             exception.printStackTrace();
             DirtBot.pokeDevs(exception);
-            channelID = null;
         }
 
-        return channelID;
+        return Optional.empty();
     }
 
     public void addConfirmationMessage(int ticketId, String confirmationMessageId, String reason) {
@@ -315,7 +363,7 @@ public class TicketsDatabaseHelper {
             statement.setString(3, reason);
             statement.setString(4, closeTime);
 
-            statement.execute();
+            statement.executeUpdate();
             /*
             // Execute Query & Clean Up
             if (!statement.execute()) {
@@ -332,24 +380,21 @@ public class TicketsDatabaseHelper {
         try (
             //Establish Database Connection
             Connection con = getDatabaseConnection();
-
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE closetime IS NOT NULL")) {
+            PreparedStatement statement = con.prepareStatement("SELECT ticketid, closetime FROM closes WHERE closetime IS NOT NULL")) {
 
             // Fetch Results
-            ResultSet results = statement.executeQuery();
-
-            while (results.next()) {
-                timedCloses.put(results.getInt("ticketid"), results.getString("closetime"));
+            try (ResultSet results = statement.executeQuery()) {
+                while (results.next()) {
+                    timedCloses.put(results.getInt("ticketid"), results.getString("closetime"));
+                }
             }
 
-            // Clean Up
-            results.close();
         } catch (SQLException e) {
             e.printStackTrace();
             DirtBot.pokeDevs(e);
-            timedCloses = null;
         }
+
         return timedCloses;
     }
 
@@ -358,7 +403,7 @@ public class TicketsDatabaseHelper {
             // Establish Database Connection
             Connection con = getDatabaseConnection();
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE confirmationid=?")) {
+            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE confirmationid = ?")) {
             statement.setString(1, confirmationMessageId);
 
             statement.executeUpdate();
@@ -379,7 +424,7 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE ticketid=?")) {
+            PreparedStatement statement = con.prepareStatement("DELETE FROM closes WHERE ticketid = ?")) {
 
             statement.setInt(1, ticketId);
 
@@ -448,7 +493,7 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid=?")) {
+            PreparedStatement statement = con.prepareStatement("SELECT * FROM closes WHERE confirmationid=  ?")) {
 
             statement.setString(1, confirmationMessageId);
 

@@ -1,7 +1,5 @@
 package net.dirtcraft.dirtbot.modules;
 
-import br.com.azalim.mcserverping.MCPing;
-import br.com.azalim.mcserverping.MCPingResponse;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
 import net.dirtcraft.dirtbot.DirtBot;
@@ -14,9 +12,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberLeaveEvent;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.Timer;
@@ -86,7 +83,7 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
     }
 
     @Override
-    public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
+    public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
         this.setMemberCount();
     }
 
@@ -114,12 +111,15 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
     }
 
     private int getPlayerCount() {
+        /*
         try {
             MCPingResponse reply = MCPing.getPing(getConfig().serverIP);
             return reply.getPlayers().getOnline();
         } catch (IOException exception) {
             return -1;
         }
+         */
+        return -1;
     }
 
 }

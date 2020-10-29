@@ -90,7 +90,7 @@ public class VerificationDatabaseHelper {
             ps.setString(1, code);
 
             try (ResultSet rs = ps.executeQuery()) {
-                return Optional.ofNullable(rs.next());
+                return Optional.of(rs.next());
             }
 
         } catch (SQLException exception) {
@@ -114,7 +114,7 @@ public class VerificationDatabaseHelper {
         return Optional.empty();
     }
 
-    public Optional<String> getUsernamefromUUID(String uuid) {
+    public Optional<String> getUsernameFromUUID(String uuid) {
         if (uuid == null) return Optional.empty();
 
         try (Connection connection = getDatabaseConnection();
