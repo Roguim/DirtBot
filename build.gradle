@@ -3,10 +3,6 @@ plugins {
     id 'java'
 }
 
-configurations {
-    compile.extendsFrom shadow
-}
-
 group 'net.dirtcraft'
 version '3.0'
 
@@ -46,17 +42,8 @@ jar {
     }
 }
 
-jar.enabled = true
-
-build.dependsOn shadowJar
-
 compileJava {
     options.incremental = false
-}
-
-shadowJar {
-    classifier = null
-    configurations = [project.configurations.compile]
 }
 
 compileJava.options.encoding = 'UTF-8'
