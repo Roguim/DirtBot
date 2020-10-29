@@ -31,7 +31,7 @@ dependencies {
     implementation "net.lingala.zip4j:zip4j:1.3.3"
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.vdurmont:emoji-java:4.0.0'
-    implementation 'com.github.lucaazalim:minecraft-server-ping:-SNAPSHOT'
+    //implementation 'com.github.lucaazalim:minecraft-server-ping:-SNAPSHOT'
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.2'
