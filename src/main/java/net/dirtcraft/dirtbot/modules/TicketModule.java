@@ -534,6 +534,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     }
 
     private void ticketInternalMessageReceived(MessageReceivedEvent event) {
+        if (!getTicketUtils().isTicketChannel(event.getTextChannel())) return;
         // Awaiting Member
         if(event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
             String message = "Awaiting ";

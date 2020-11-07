@@ -80,11 +80,11 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     }
 
     private void giveRole(MessageReactionAddEvent event) {
-        if (event.getMember() == null) return;
-        if (event.getMember().getUser().isBot()) return;
+        Member member = event.retrieveMember().complete();
+        if (member.getUser().isBot()) return;
 
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
-                event.getGuild().addRoleToMember(event.getMember(), role).queue());
+                event.getGuild().addRoleToMember(member, role).queue());
 
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.GREEN)
@@ -96,12 +96,11 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
             embed.setDescription("You are now subscribed to updates regarding **Pixelmon Reforged**");
         }
 
-        if (event.getUser() == null) return;
-        event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
+        member.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 
     private void removeRole(MessageReactionRemoveEvent event) {
-        Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).retrieveMemberById(event.getUserId()).complete();
+        Member member = event.retrieveMember().complete();
         if (member.getUser().isBot()) return;
 
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
@@ -116,7 +115,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         } else {
             embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
         }
-        if (event.getUser() == null) return;
-        event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
+
+        member.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }
