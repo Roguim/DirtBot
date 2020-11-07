@@ -36,7 +36,9 @@ public class DirtBot {
         final Collection<GatewayIntent> intents = Arrays.asList(
                 GatewayIntent.GUILD_MEMBERS,
                 GatewayIntent.GUILD_MESSAGES,
-                GatewayIntent.DIRECT_MESSAGES
+                GatewayIntent.DIRECT_MESSAGES,
+                GatewayIntent.GUILD_EMOJIS,
+                GatewayIntent.GUILD_MESSAGE_REACTIONS
         );
         jda = JDABuilder.createDefault(getConfig().botToken, intents)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)

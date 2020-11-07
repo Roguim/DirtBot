@@ -101,10 +101,8 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     }
 
     private void removeRole(MessageReactionRemoveEvent event) {
-        // Temporary fix because event.getMember() returns null
-        if (event.getUser() == null) return;
-        if (event.getUser().isBot()) return;
-        Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).retrieveMember(event.getUser()).complete();
+        Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).retrieveMemberById(event.getUserId()).complete();
+        if (member.getUser().isBot()) return;
 
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
                 event.getGuild().removeRoleFromMember(member, role).queue());
@@ -118,6 +116,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         } else {
             embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
         }
+        if (event.getUser() == null) return;
         event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }
