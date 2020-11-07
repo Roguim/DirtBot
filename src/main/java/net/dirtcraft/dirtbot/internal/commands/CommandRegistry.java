@@ -54,12 +54,7 @@ public class CommandRegistry {
                         event.getTextChannel().sendMessage(responseEmbed.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
                         event.getMessage().delete().queue();
                     } // Check if command is sent in Gamechat category, do not allow command to run if it is
-                    else if (event.getJDA().getCategoryById("516473998478016512").getTextChannels().contains(event.getTextChannel())) {
-                        EmbedBuilder responseEmbed = DirtBot.getModuleRegistry().getModule(command.getClass().getAnnotation(CommandClass.class).value()).getEmbedUtils().getEmptyEmbed()
-                                .addField("__Error | Invalid Channel!__", "This is not a valid channel for this command!", false);
-                        event.getTextChannel().sendMessage(responseEmbed.build()).queue((message) -> message.delete().queueAfter(10, TimeUnit.SECONDS));
-                        event.getMessage().delete().queue();
-                    }
+                    else if (event.getJDA().getCategoryById("516473998478016512").getTextChannels().contains(event.getTextChannel())) event.getMessage().delete().queue();
                     else if (!validArgs(command, args)) {
                         Module module = DirtBot.getModuleRegistry().getModule(command.getClass().getAnnotation(CommandClass.class).value());
                         module.getEmbedUtils().sendResponse(module.getEmbedUtils().invalidArgsEmbed(command.args(), command.aliases().get(0)).build(), event.getTextChannel());

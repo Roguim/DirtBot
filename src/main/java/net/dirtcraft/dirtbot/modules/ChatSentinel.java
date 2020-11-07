@@ -1,12 +1,7 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
@@ -14,11 +9,11 @@ import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.time.Instant;
+import java.util.ArrayList;
 
 @ModuleClass
 public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, ChatSentinel.EmbedUtilsChatSentinel> {
@@ -33,7 +28,7 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
@@ -60,17 +55,17 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
         }
     }
 
+    /*
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         Guild server = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
-        Member ten = server.getMemberById("155688380162637825");
-        Member julian = server.getMemberById("209865813849538560");
+        if (server == null) return;
+        Member ten = server.retrieveMemberById("155688380162637825").complete();
+        Member julian = server.retrieveMemberById("209865813849538560").complete();
 
         if (event.getMember() == null) return;
-        if (event.getMember().getUser().isFake() || event.getMember().getUser().isBot()) return;
+        if (event.getMember().getUser().isBot()) return;
         if (DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID) == null) return;
-        if (event.getMember() == null) return;
-        if (event.getMember().getRoles() == null) return;
         if (!event.getMessage().getAuthor().isBot() && !event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) {
             if (event.getMessage().getMentionedMembers().contains(ten)) {
                 event.getTextChannel().sendMessage(getEmbedUtils().getErrorEmbed("Hey! <@155688380162637825> doesn't like to be pinged.\nWhy don't you make a ticket instead?\nUse <#" + DirtBot.getModuleRegistry().getModule(TicketModule.class).getConfig().supportChannelID + ">.").build()).queue(m -> m.delete().queueAfter(10, TimeUnit.SECONDS));
@@ -83,21 +78,20 @@ public class ChatSentinel extends Module<ChatSentinel.ConfigDataChatSentinel, Ch
                 //event.getMessage().delete().queue();
             }
         }
-    }
+    }*/
 
     @Override
     public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) {
         ArrayList<String> names = new ArrayList<>();
         Role staffRole = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getRoleById(DirtBot.getConfig().staffRoleID);
+        if (staffRole == null) return;
         if (event.getMember().getRoles().contains(staffRole)) return;
 
         event.getGuild().getMembersWithRoles(staffRole).forEach(staffMember -> {
-            if (staffMember.getNickname() == null) {
-                names.add(staffMember.getEffectiveName());
-            } else {
+            if (staffMember.getNickname() != null) {
                 names.add(staffMember.getUser().getName());
-                names.add(staffMember.getEffectiveName());
             }
+            names.add(staffMember.getEffectiveName());
         });
 
         if (names.contains(event.getNewNickname())) {

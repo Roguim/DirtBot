@@ -1,9 +1,5 @@
 package net.dirtcraft.dirtbot.commands.tickets;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.internal.commands.CommandArgument;
@@ -15,6 +11,10 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @CommandClass(TicketModule.class)
 public class SetLevel extends CommandTicketStaff {
@@ -54,7 +54,7 @@ public class SetLevel extends CommandTicketStaff {
                             String pingMessage = "";
                             boolean hasUser = false;
                             for(User user : users) {
-                                Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).getMember(user);
+                                Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).retrieveMember(user).complete();
                                 if (member == null) continue;
                                 if (!member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) continue;
                                 if(!user.isBot() && member.getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().adminRoleID))) {

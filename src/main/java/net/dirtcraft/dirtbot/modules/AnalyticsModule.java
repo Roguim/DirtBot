@@ -1,10 +1,7 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.time.Instant;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.misc.Analytics;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
@@ -14,6 +11,8 @@ import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.analytics.AnalyticsDatabaseHelper;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.time.Instant;
 
 @ModuleClass(eventSubscriber = false, requiresDatabase = true)
 public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics, AnalyticsModule.EmbedUtilsAnalytics> {
@@ -35,7 +34,7 @@ public class AnalyticsModule extends Module<AnalyticsModule.ConfigDataAnalytics,
         spec.define("database.user", "");
         spec.define("database.password", "");
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", "<:redbulletpoint:539273059631104052> DirtCraft's DirtBOT <:redbulletpoint:539273059631104052>");
         spec.define("discord.embeds.color", 16711680);
 

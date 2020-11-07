@@ -7,6 +7,7 @@ import net.dirtcraft.dirtbot.internal.commands.ICommand;
 import net.dirtcraft.dirtbot.modules.PunishmentModule;
 import net.dirtcraft.dirtbot.modules.PunishmentModule.PunishmentLogType;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -67,14 +68,16 @@ public class Mute implements ICommand {
 			reason += args.get(i) + " ";
 		}
 		reason = reason.trim();
-		
+
+		Role mutedRole = DirtBot.getJda().getRoleById(module.getConfig().mutedRoleID);
+
 		//Try to add the muted role
-		if(event.getGuild().getMember(punished).getRoles().contains(event.getJDA().getRoleById(module.getConfig().mutedRoleID))) {
+		if(event.getGuild().retrieveMember(punished).complete().getRoles().contains(mutedRole)) {
 			module.getEmbedUtils().sendError("User is already muted!", event.getTextChannel());
 			event.getMessage().delete().queue();
 			return false;
 		}
-		event.getGuild().addRoleToMember(event.getGuild().getMember(punished), DirtBot.getJda().getRoleById(module.getConfig().mutedRoleID)).queue();
+		event.getGuild().addRoleToMember(event.getGuild().retrieveMember(punished).complete(), mutedRole).queue();
 		
 		//Send punishment log
 		module.getEmbedUtils().sendPunishLog(punisher.getId(), punished.getId(), PunishmentLogType.MUTE, lengthReadable, reason);

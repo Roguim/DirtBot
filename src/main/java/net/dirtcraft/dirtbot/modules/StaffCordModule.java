@@ -129,7 +129,7 @@ public class StaffCordModule extends Module<StaffCordModule.StaffCordConfigData,
 	public void initializeConfiguration() {
 		ConfigSpec spec = new ConfigSpec();
 		
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", "<:redbulletpoint:539273059631104052> DirtCraft's DirtBOT <:redbulletpoint:539273059631104052>");
         spec.define("discord.embeds.color", 16711680);
         

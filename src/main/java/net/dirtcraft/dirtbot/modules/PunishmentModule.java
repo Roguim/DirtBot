@@ -13,9 +13,7 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 
 import java.sql.*;
@@ -51,7 +49,7 @@ public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigDa
 		
 		spec.define("discord.roles.mutedRoleID", "589777192024670228"); 
 		
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", "<:redbulletpoint:539273059631104052> DirtCraft's DirtBOT <:redbulletpoint:539273059631104052>");
         spec.define("discord.embeds.color", 16711680);
 		
@@ -86,44 +84,52 @@ public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigDa
 
 		timer.schedule( new TimerTask() {
 		    public void run() {
-		    	try {
+		    	try (
 					Connection con = DriverManager.getConnection(getConfig().databaseUrl, getConfig().databaseUser, getConfig().databasePassword);
 					
-					PreparedStatement statement = con.prepareStatement("SELECT * FROM mutes");
+					PreparedStatement statement = con.prepareStatement("SELECT * FROM mutes")) {
 					try(ResultSet results = statement.executeQuery()) {
+						Guild guild = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID);
+						if (guild == null) return;
+
 						while(results.next()) {
-							User user = DirtBot.getJda().getUserById(results.getString("discordid"));
+							User user = DirtBot.getJda().retrieveUserById(results.getString("discordid")).complete();
 							java.util.Date unmuteDate = results.getDate("unmutetime");
 							java.util.Date currentDate = new java.util.Date();
 							//Check if user is still in server
-							if(!DirtBot.getJda().getGuildById("269639757351354368").isMember(user)) {
-								PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid=?");
-								statementDelete.setString(1, user.getId());
-								statementDelete.execute();
+							if(guild.retrieveMember(user).complete() != null) {
+								try (PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid = ?")) {
+									statementDelete.setString(1, user.getId());
+									statementDelete.executeUpdate();
+								}
 								continue;
 							}
 							
 							//Check if user is still muted
-							Member member = DirtBot.getJda().getGuildById("269639757351354368").getMember(user); 
+							Member member = guild.retrieveMember(user).complete();
 							if(!member.getRoles().contains(DirtBot.getJda().getRoleById(getConfig().mutedRoleID))) {
-								PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid=?");
-								statementDelete.setString(1, user.getId());
-								statementDelete.execute();
+								try (PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid = ?")) {
+									statementDelete.setString(1, user.getId());
+									statementDelete.executeUpdate();
+								}
 								continue;
 							}
 							
 							//Check if time is up on mute
 							if(currentDate.compareTo(unmuteDate) > 0) {
-								DirtBot.getJda().getGuildById("269639757351354368").removeRoleFromMember(member, DirtBot.getJda().getRoleById(getConfig().mutedRoleID)).queue();
-								PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid=?");
-								statementDelete.setString(1, user.getId());
-								statementDelete.execute();
+								Role mutedRole = guild.getRoleById(getConfig().mutedRoleID);
+								if (mutedRole == null) return;
+								guild.removeRoleFromMember(member, mutedRole).queue();
+								try (PreparedStatement statementDelete = con.prepareStatement("DELETE FROM mutes WHERE discordid = ?")) {
+									statementDelete.setString(1, user.getId());
+									statementDelete.executeUpdate();
+								}
 							}
 						}
 					}
 
-					con.close();
 				} catch (SQLException e) {
+		    		e.printStackTrace();
 					DirtBot.pokeDevs(e);
 				}
 		    }
@@ -166,59 +172,59 @@ public class PunishmentModule extends Module<PunishmentModule.PunishmentConfigDa
         
         public void sendPunishLog(String punisherID, String punishedID, PunishmentLogType logType, String length, String reason) {
         	TextChannel punishmentLogChannel = DirtBot.getJda().getTextChannelById(getConfig().punishmentLogChannelID);
-        	
+
         	switch(logType) {
-        	case BAN:
-        		EmbedBuilder banLog = getEmptyEmbed().addField("__Punishment Event__", 
-        		"**Punishment Type:** Ban\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Punished Player:** <@" + punishedID + ">\n" +
-        		"**Reason:** " + reason, false);
-        		punishmentLogChannel.sendMessage(banLog.build()).queue();
-        		break;
-        	case KICK:
-        		EmbedBuilder kickLog = getEmptyEmbed().addField("__Punishment Event__", 
-        		"**Punishment Type:** Kick\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Punished Player:** <@" + punishedID + ">\n" +
-        		"**Reason:** " + reason, false);
-        		punishmentLogChannel.sendMessage(kickLog.build()).queue();
-        		break;
-        	case MUTE:
-        		EmbedBuilder muteLog = getEmptyEmbed().addField("__Punishment Event__", 
-        		"**Punishment Type:** Mute\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Punished Player:** <@" + punishedID + ">\n" +
-        		"**Duration:** " + length + "\n" +
-        		"**Reason:** " + reason, false);
-        		punishmentLogChannel.sendMessage(muteLog.build()).queue();
-        		break;
-        	case UNMUTE:
-        		EmbedBuilder unmuteLog = getEmptyEmbed().addField("__Punishment Event__", 
-        		"**Punishment Type:** Unmute\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Punished Player:** <@" + punishedID + ">", false);
-        		punishmentLogChannel.sendMessage(unmuteLog.build()).queue();
-        		break;
-        	case CLEARCHATALL:
-        		EmbedBuilder clearChatAllLog = getEmptyEmbed().addField("__Punishment Event__",
-        		"**Punishment Type:** Clear All Chat\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Channel:** <#" + punishedID + ">\n" +
-        		"**Messages Cleared:** " + length + "\n" +
-        		"**Reason:** " + reason, false);
-        		punishmentLogChannel.sendMessage(clearChatAllLog.build()).queue();
-        		break;
-        	case CLEARCHATUSER:
-        		EmbedBuilder clearChatUserLog = getEmptyEmbed().addField("__Punishment Event__",
-        		"**Punishment Type:** Clear User Chat\n" +
-        		"**Punisher:** <@" + punisherID + ">\n" +
-        		"**Punished Player:** <@" + punishedID + ">\n" +
-        		"**Messages Cleared:** " + length + "\n" +
-        		"**Reason:** " + reason, false);
-        		punishmentLogChannel.sendMessage(clearChatUserLog.build()).queue();
-        		break;
-        	}
+				case BAN:
+					EmbedBuilder banLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Ban\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Punished Player:** <@" + punishedID + ">\n" +
+									"**Reason:** " + reason, false);
+					punishmentLogChannel.sendMessage(banLog.build()).queue();
+					break;
+				case KICK:
+					EmbedBuilder kickLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Kick\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Punished Player:** <@" + punishedID + ">\n" +
+									"**Reason:** " + reason, false);
+					punishmentLogChannel.sendMessage(kickLog.build()).queue();
+					break;
+				case MUTE:
+					EmbedBuilder muteLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Mute\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Punished Player:** <@" + punishedID + ">\n" +
+									"**Duration:** " + length + "\n" +
+									"**Reason:** " + reason, false);
+					punishmentLogChannel.sendMessage(muteLog.build()).queue();
+					break;
+				case UNMUTE:
+					EmbedBuilder unmuteLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Unmute\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Punished Player:** <@" + punishedID + ">", false);
+					punishmentLogChannel.sendMessage(unmuteLog.build()).queue();
+					break;
+				case CLEARCHATALL:
+					EmbedBuilder clearChatAllLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Clear All Chat\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Channel:** <#" + punishedID + ">\n" +
+									"**Messages Cleared:** " + length + "\n" +
+									"**Reason:** " + reason, false);
+					punishmentLogChannel.sendMessage(clearChatAllLog.build()).queue();
+					break;
+				case CLEARCHATUSER:
+					EmbedBuilder clearChatUserLog = getEmptyEmbed().addField("__Punishment Event__",
+							"**Punishment Type:** Clear User Chat\n" +
+									"**Punisher:** <@" + punisherID + ">\n" +
+									"**Punished Player:** <@" + punishedID + ">\n" +
+									"**Messages Cleared:** " + length + "\n" +
+									"**Reason:** " + reason, false);
+					punishmentLogChannel.sendMessage(clearChatUserLog.build()).queue();
+					break;
+			}
         }
 		
 	}

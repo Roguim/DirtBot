@@ -2,6 +2,9 @@ package net.dirtcraft.dirtbot.modules;
 
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
+import net.dirtcraft.dirtbot.DirtBot;
+import net.dirtcraft.dirtbot.commands.roles.CreateModpackRole;
+import net.dirtcraft.dirtbot.commands.roles.EditModpackRole;
 import net.dirtcraft.dirtbot.internal.configs.ConfigurationManager;
 import net.dirtcraft.dirtbot.internal.configs.IConfigData;
 import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
@@ -22,15 +25,22 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     public void initialize() {
         // Initialize Embed Utils
         setEmbedUtils(new EmbedUtilsServerRoles());
+
+        DirtBot.getCoreModule().registerCommands(
+                new CreateModpackRole(this),
+                new EditModpackRole(this)
+        );
     }
 
     @Override
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
+
+        spec.define("server.roles.token", "");
 
         setConfig(new ConfigurationManager<>(ConfigDataServerRoles.class, spec, "ServerRoles"));
     }
@@ -42,6 +52,9 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         public String embedTitle;
         @Path("discord.embeds.color")
         public int embedColor;
+
+        @Path("server.roles.token")
+        public String serverRolesToken;
     }
 
     public class EmbedUtilsServerRoles extends EmbedUtils {
@@ -66,6 +79,9 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     }
 
     private void giveRole(MessageReactionAddEvent event) {
+        if (event.getMember() == null) return;
+        if (event.getMember().getUser().isBot()) return;
+
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
                 event.getGuild().addRoleToMember(event.getMember(), role).queue());
 
@@ -78,10 +94,15 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         } else {
             embed.setDescription("You are now subscribed to updates regarding **Pixelmon Reforged**");
         }
-        event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
+
+        if (event.getUser() == null) return;
+        event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 
     private void removeRole(MessageReactionRemoveEvent event) {
+        if (event.getMember() == null) return;
+        if (event.getMember().getUser().isBot()) return;
+
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
                 event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
 
@@ -94,6 +115,7 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         } else {
             embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
         }
-        event.getMember().getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
+        if (event.getUser() == null) return;
+        event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }

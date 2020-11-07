@@ -163,7 +163,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
         spec.define("intervals.gamesync", -1);
         spec.define("intervals.autoclose", -1);
 
-        spec.define("discord.embeds.footer", "DirtCraft Support System | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft Support :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
@@ -210,7 +210,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     @Override
     public void onGuildMessageReactionRemove(GuildMessageReactionRemoveEvent event) {
-        if(event.getUser().isBot()) return;
+        if (event.getUser() == null) return;
+        if (event.getUser().isBot()) return;
 
         event.getChannel().retrieveMessageById(event.getMessageId()).queue((message) -> {
             if(!message.getAuthor().isBot()) return;

@@ -31,13 +31,13 @@ public class Servers implements ICommand {
         final ArrayList<String> pixelNames = new ArrayList<String>() {{
             add("Pixelmon RedStone");
             add("Pixelmon GlowStone");
-            add("Pixelmon Lapis");
+            //add("Pixelmon Lapis");
         }};
 
         final ArrayList<String> pixelIPs = new ArrayList<String>() {{
             add("**RED**.PIXELMON.GG");
             add("**GLOW**.PIXELMON.GG");
-            add("Coming Soon");
+            //add("Coming Soon");
         }};
 
         ArrayList<String> names = new ArrayList<>();

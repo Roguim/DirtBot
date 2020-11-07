@@ -38,7 +38,7 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
         spec.define("database.user", "");
         spec.define("database.password", "");
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
@@ -79,7 +79,8 @@ public class VerificationModule extends Module<VerificationModule.ConfigDataVeri
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent event) {
-        if (event.getUser().isBot() || event.getUser().isFake()) return;
+        if (event.getUser() == null) return;
+        if (event.getUser().isBot()) return;
         if (!event.getChannel().getId().equals(getConfig().verificationChannelID)) return;
 
         event.getReaction().removeReaction(event.getUser()).queue();

@@ -33,7 +33,7 @@ public class Unmute implements ICommand {
 			event.getMessage().delete().queue();
 			return false;
 		} else {
-			punished = event.getGuild().getMember(event.getMessage().getMentionedUsers().get(0));
+			punished = event.getGuild().retrieveMember(event.getMessage().getMentionedUsers().get(0)).complete();
 		}
 		
 		if(!punished.getRoles().contains(event.getJDA().getRoleById(module.getConfig().mutedRoleID))) {

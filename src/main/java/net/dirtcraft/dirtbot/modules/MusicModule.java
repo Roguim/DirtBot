@@ -1,10 +1,7 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.time.Instant;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.music.Connect;
 import net.dirtcraft.dirtbot.commands.music.Disconnect;
@@ -17,6 +14,8 @@ import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.music.MusicUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+
+import java.time.Instant;
 
 @ModuleClass(eventSubscriber = false, experimental = true)
 public class MusicModule extends Module<MusicModule.ConfigDataMusic, MusicModule.EmbedUtilsMusic> {
@@ -38,7 +37,7 @@ public class MusicModule extends Module<MusicModule.ConfigDataMusic, MusicModule
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 

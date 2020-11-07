@@ -1,27 +1,8 @@
 package net.dirtcraft.dirtbot.modules;
 
-import java.io.File;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.electronwill.nightconfig.core.conversion.Path;
 import com.google.common.collect.Lists;
-
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.commands.appeals.AcceptAppeal;
 import net.dirtcraft.dirtbot.commands.appeals.RejectAppeal;
@@ -34,15 +15,24 @@ import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dirtcraft.dirtbot.utils.appeals.AppealUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @ModuleClass
 public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealModule.EmbedUtilsAppeals> {
@@ -114,7 +104,7 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft Appeals System | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft Appeals :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 
@@ -130,10 +120,9 @@ public class AppealModule extends Module<AppealModule.ConfigDataAppeals, AppealM
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if(event.getAuthor().isBot() || event.getAuthor().isFake()) return;
+        if(event.getAuthor().isBot()) return;
 
         // Appeal Setup Message?
-        if (event.getTextChannel() == null) return;
         if (event.getTextChannel().getParent() == null) return;
         if (event.getTextChannel().getParent().getId().equals(getConfig().appealCategoryID)) {
             ticketInformationFilled(event, null, event.getMessage());

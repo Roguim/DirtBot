@@ -49,7 +49,7 @@ public class CommandsModule extends Module<CommandsModule.ConfigDataCommands, Co
     public void initializeConfiguration() {
         ConfigSpec spec = new ConfigSpec();
 
-        spec.define("discord.embeds.footer", "DirtCraft's DirtBOT | 2019");
+        spec.define("discord.embeds.footer", "Created for DirtCraft");
         spec.define("discord.embeds.title", ":redbulletpoint: DirtCraft's DirtBOT :redbulletpoint:");
         spec.define("discord.embeds.color", 16711680);
 

@@ -88,7 +88,7 @@ public class DirtBot {
     public static void pokeDevs(Exception e) {
         for (String notification : exceptionNotifications) {
             @Nullable
-            User user = DirtBot.getJda().getUserById(notification);
+            User user = DirtBot.getJda().retrieveUserById(notification).complete();
             if (user == null) continue;
             user.openPrivateChannel().queue((privateChannel) -> {
                 String[] exception = ExceptionUtils.getStackTrace(e).split("\\r?\\n");
