@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @ModuleClass(requiresDatabase = true)
@@ -363,8 +364,8 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     public HashMap<String, String> getTicketNotificationEmbeds() { return ticketNotificationEmbeds; }
 
-    public void archiveTicket(Ticket ticket) {
-        archiveTicket(DirtBot.getJda().getTextChannelById(ticket.getChannel()), ticket.getId());
+    public CompletableFuture<Void> archiveTicket(Ticket ticket) {
+        return CompletableFuture.runAsync(() -> archiveTicket(DirtBot.getJda().getTextChannelById(ticket.getChannel()), ticket.getId()));
     }
 
     private void archiveTicket(TextChannel channel, int ticketID) {
@@ -376,7 +377,6 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                         for(Message message : Lists.reverse(messageHistory)) {
                             if (message == null) continue;
                             if (message.getMember() == null) continue;
-                            if (message.getMember().getEffectiveName() == null) continue;
                             String line = "";
                             line += message.getMember().getEffectiveName();
                             line += " : ";

@@ -12,10 +12,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.security.auth.login.LoginException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @CommandClass(ServerRolesModule.class)
 public class EditModpackRole implements ICommand {
@@ -46,10 +43,11 @@ public class EditModpackRole implements ICommand {
             if (optionalLine.isPresent()) {
                 String line = optionalLine.get();
                 int index = lines.indexOf(line);
-                lines.remove(line);
+                ArrayList<String> newLines = new ArrayList<>(lines);
+                newLines.remove(index);
                 String newLine = "<:" + emote.getName() + ":" + emote.getId() + "> — **" + name + "**";
-                lines.add(index, newLine);
-                builder.setDescription(String.join("\n", lines));
+                newLines.add(index, newLine);
+                builder.setDescription(String.join("\n", newLines));
                 message.editMessage(builder.build()).complete();
             }
 

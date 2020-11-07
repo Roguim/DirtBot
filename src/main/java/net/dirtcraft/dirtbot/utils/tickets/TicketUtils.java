@@ -10,6 +10,10 @@ import net.dv8tion.jda.api.entities.*;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class TicketUtils {
 
@@ -86,11 +90,11 @@ public class TicketUtils {
     }
 
     public void closeTicket(Ticket ticket, String message, boolean review) {
-        module.archiveTicket(ticket);
+        CompletableFuture<Void> archive = module.archiveTicket(ticket);
         TextChannel ticketChannel = DirtBot.getJda().getTextChannelById(ticket.getChannel());
         module.getDatabaseHelper().removeAllConfirmationMessages(ticket.getId());
         module.getEmbedUtils().deleteTicketAdminMessage(ticket, ticket.getServer(true));
-        if(review) {
+        if (review) {
             EmbedBuilder reviewDM = module.getEmbedUtils().getExternalEmbed()
                     .addField("__Ticket Closed__", "Your ticket (#" + ticket.getId() + " | " + ticketChannel.getName() + ") has been closed for the following reason:\n" +
                             "```" + message + "```", false);
@@ -98,6 +102,13 @@ public class TicketUtils {
                 member.getUser().openPrivateChannel().queue((dmChannel) ->  dmChannel.sendMessage(reviewDM.build()).queue());
             }
         }
+
+        try {
+            archive.get(30, TimeUnit.SECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException exception) {
+            exception.printStackTrace();
+        }
+
         ticketChannel.delete().queue(success -> {
             ticket.setOpen(false);
             ticket.setChannel(null);

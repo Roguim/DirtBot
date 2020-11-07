@@ -8,11 +8,15 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.annotation.Nullable;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 // You would rarely ever have to modify this class. New commands, features, etc. all belong in modules.
@@ -28,8 +32,14 @@ public class DirtBot {
         coreModule = new CoreModule();
         coreModule.initializeConfiguration();
 
-        //Initialize Discord Bot
-        jda = JDABuilder.createDefault(getConfig().botToken)
+       //Initialize Discord Bot
+        final Collection<GatewayIntent> intents = Arrays.asList(
+                GatewayIntent.GUILD_MEMBERS,
+                GatewayIntent.GUILD_MESSAGES,
+                GatewayIntent.DIRECT_MESSAGES
+        );
+        jda = JDABuilder.createDefault(getConfig().botToken, intents)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .build()
                 .awaitReady();
         jda.getPresence().setActivity(Activity.of(ActivityType.STREAMING, "Booting Up...", "https://www.twitch.tv/dirtcraft/"));

@@ -11,6 +11,7 @@ import net.dirtcraft.dirtbot.internal.embeds.EmbedUtils;
 import net.dirtcraft.dirtbot.internal.modules.Module;
 import net.dirtcraft.dirtbot.internal.modules.ModuleClass;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -100,11 +101,13 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
     }
 
     private void removeRole(MessageReactionRemoveEvent event) {
-        if (event.getMember() == null) return;
-        if (event.getMember().getUser().isBot()) return;
+        // Temporary fix because event.getMember() returns null
+        if (event.getUser() == null) return;
+        if (event.getUser().isBot()) return;
+        Member member = DirtBot.getJda().getGuildById(DirtBot.getConfig().serverID).retrieveMember(event.getUser()).complete();
 
         event.getGuild().getRolesByName(event.getReactionEmote().getName().toLowerCase(), true).forEach(role ->
-                event.getGuild().removeRoleFromMember(event.getMember(), role).queue());
+                event.getGuild().removeRoleFromMember(member, role).queue());
 
         EmbedBuilder embed = getEmbedUtils().getEmptyEmbed()
                 .setColor(Color.RED)
@@ -115,7 +118,6 @@ public class ServerRolesModule extends Module<ServerRolesModule.ConfigDataServer
         } else {
             embed.setDescription("You are no longer subscribed to updates regarding **Pixelmon Reforged**");
         }
-        if (event.getUser() == null) return;
         event.getUser().openPrivateChannel().queue(dm -> dm.sendMessage(embed.build()).queue());
     }
 }
