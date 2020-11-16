@@ -480,13 +480,12 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
     private void ticketCreationMessageReceived(MessageReceivedEvent event) {
         // If a staff member is using ignore, don't go any further
-        if(event.getMessage().getContentRaw().startsWith(DirtBot.getConfig().botPrefix + "ignore") && event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return;
+        if (event.getMessage().getContentRaw().startsWith(DirtBot.getConfig().botPrefix + "ignore") && event.getMember().getRoles().contains(DirtBot.getJda().getRoleById(DirtBot.getConfig().staffRoleID))) return;
 
-        if (databaseHelper.hasOpenTicket(event.getMember().getUser().getId()) && !getVerificationDB().isVerified(event.getMember().getUser().getId())) {
-            EmbedBuilder response;
+        if (databaseHelper.hasOpenTicket(event.getAuthor().getId()) && !getVerificationDB().isVerified(event.getAuthor().getId())) {
             String verificationChannelID = getVerification().getConfig().verificationChannelID;
-            Optional<String> optionalChannelId = databaseHelper.getLastTicketChannelID(event.getMember().getUser().getId());
-            response = getEmbedUtils().getErrorEmbed(
+            Optional<String> optionalChannelId = databaseHelper.getLastTicketChannelID(event.getAuthor().getId());
+            EmbedBuilder response = getEmbedUtils().getErrorEmbed(
                     (optionalChannelId.map(s -> "You already have ticket <#" + s + "> open!")
                             .orElse("You already have a ticket open!")) +
                             "Verify in <#" + verificationChannelID + "> to create more!");
@@ -508,8 +507,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
             return;
         }
 
-        Optional<String> optionalUUID = getVerificationDB().getUUIDfromDiscordID(event.getMember().getUser().getId());
-        String username = optionalUUID.map(s -> getVerificationDB().getUsernameFromUUID(s).orElse("N/A")).orElse("N/A");
+        String username = databaseHelper.getUsernameFromDiscordId(event.getAuthor().getId()).orElse(null);
 
         String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
         TextChannel ticketChannel = ticketUtils.createTicket(

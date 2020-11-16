@@ -49,7 +49,7 @@ public class TicketUtils {
     }
 
     public TextChannel createTicket(String message, Member member, String username) {
-        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message, member.getUser().getId(), username)), member);
+        return createTicket(module.getDatabaseHelper().createTicket(new Ticket(message, member.getId(), username)), member);
     }
 
     public TextChannel createTicket(Ticket ticket, Member member) {

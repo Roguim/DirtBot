@@ -23,14 +23,14 @@ public class Ticket {
     }
 
     public Ticket(String message, String discordID, String username) {
-        this(0, true, message, username, null, null, Level.NORMAL, discordID);
+        new Ticket(0, true, message, username, null, null, Level.NORMAL, discordID);
     }
 
     public int getId() { return id; }
     public boolean getOpen() { return open; }
     public String getMessage() { return message; }
     public String getUsername(boolean nullable) {
-        return nullable ? username.replace("N/A", null) : (username != null ? username : "");
+        return nullable ? username : (username != null ? username : "");
     }
     public String getServer(boolean nullable) {
         return nullable ? server : (server != null ? server : "");

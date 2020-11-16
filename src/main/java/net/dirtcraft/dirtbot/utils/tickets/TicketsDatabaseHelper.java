@@ -3,12 +3,11 @@ package net.dirtcraft.dirtbot.utils.tickets;
 import net.dirtcraft.dirtbot.DirtBot;
 import net.dirtcraft.dirtbot.data.Ticket;
 import net.dirtcraft.dirtbot.modules.TicketModule;
+import net.dirtcraft.dirtbot.modules.VerificationModule;
+import net.dirtcraft.dirtbot.utils.verification.VerificationDatabaseHelper;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class TicketsDatabaseHelper {
 
@@ -507,6 +506,13 @@ public class TicketsDatabaseHelper {
             DirtBot.pokeDevs(e);
         }
         return "No reason found.";
+    }
+
+    public Optional<String> getUsernameFromDiscordId(String discordId) {
+        VerificationDatabaseHelper verificationDatabase = DirtBot.getModuleRegistry().getModule(VerificationModule.class).getVerificationDatabase();
+        Optional<String> optionalUUID = verificationDatabase.getUUIDfromDiscordID(discordId);
+        if (!optionalUUID.isPresent()) return Optional.empty();
+        return verificationDatabase.getUsernameFromUUID(optionalUUID.get());
     }
 
     /*
