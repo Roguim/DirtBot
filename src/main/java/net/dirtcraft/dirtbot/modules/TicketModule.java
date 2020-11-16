@@ -371,8 +371,9 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
     private void archiveTicket(TextChannel channel, int ticketID) {
             List<String> lines = new ArrayList<>();
             if (channel == null) return;
-            channel.getIterableHistory().queue((messageHistory) ->
-                new Thread(() -> {
+
+            new Thread(() ->
+                channel.getIterableHistory().queue((messageHistory) -> {
                     try {
                         for(Message message : Lists.reverse(messageHistory)) {
                             if (message == null) continue;
@@ -400,7 +401,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
                         e.printStackTrace();
                         DirtBot.pokeDevs(e);
                     }
-                }).start());
+                })).start();
     }
 
     private ZipFile getArchive(int ticketID) {
@@ -509,7 +510,9 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         String username = databaseHelper.getUsernameFromDiscordId(event.getAuthor().getId()).orElse(null);
 
+        System.out.println("Message: " + event.getMessage().getContentRaw());
         String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
+        System.out.println("Reason: " + reason);
         TextChannel ticketChannel = ticketUtils.createTicket(
                 !reason.isEmpty() && reason.length() > 1 ? reason : "N/A",
                 event.getMember(), username);

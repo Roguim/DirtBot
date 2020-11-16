@@ -23,7 +23,7 @@ public class Ticket {
     }
 
     public Ticket(String message, String discordID, String username) {
-        new Ticket(0, true, message, username, null, null, Level.NORMAL, discordID);
+        this(0, true, message, username, null, null, Level.NORMAL, discordID);
     }
 
     public int getId() { return id; }
