@@ -510,9 +510,7 @@ public class TicketModule extends Module<TicketModule.ConfigDataTickets, TicketM
 
         String username = databaseHelper.getUsernameFromDiscordId(event.getAuthor().getId()).orElse(null);
 
-        System.out.println("Message: " + event.getMessage().getContentRaw());
         String reason = EmojiParser.parseToAliases(event.getMessage().getContentRaw().replaceAll("[^a-zA-Z0-9.]", " "), EmojiParser.FitzpatrickAction.REMOVE);
-        System.out.println("Reason: " + reason);
         TextChannel ticketChannel = ticketUtils.createTicket(
                 !reason.isEmpty() && reason.length() > 1 ? reason : "N/A",
                 event.getMember(), username);
