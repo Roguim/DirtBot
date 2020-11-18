@@ -89,7 +89,7 @@ public class MiscModule extends Module<MiscModule.ConfigDataMisc, MiscModule.Emb
 
     private void setMemberCount() {
         VoiceChannel voiceChannel = DirtBot.getJda().getVoiceChannelById(getConfig().memberCountChannelID);
-        int size = dirtcraftGuild.getMembers().size();
+        int size = dirtcraftGuild.loadMembers().get().size();
         if (Integer.parseInt(voiceChannel.getName().replace("Member Count: ", "").replace(",", "")) ==
                 dirtcraftGuild.getMembers().size()) return;
         String sizeString = numberFormat.format(size);

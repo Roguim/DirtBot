@@ -33,11 +33,12 @@ public class TicketsDatabaseHelper {
             Connection con = getDatabaseConnection();
 
             // Prepare Query
-            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message, discordid) VALUES (?, ?, ?)")) {
+            PreparedStatement statement = con.prepareStatement("INSERT INTO tickets (open, message, discordid, username) VALUES (?, ?, ?, ?)")) {
         
             statement.setBoolean(1, ticket.getOpen());
             statement.setString(2, ticket.getMessage());
             statement.setString(3, ticket.getDiscordID(true));
+            statement.setString(4, ticket.getUsername(true));
 
             // Create Ticket
             statement.executeUpdate();
